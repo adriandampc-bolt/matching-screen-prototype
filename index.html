@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matching Screen Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #007042;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── iPhone Frame Container ── */
+  .phone-container {
+    position: relative;
+    width: 430px;
+    height: 882px;
+  }
+
+  .phone-frame {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .phone-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  /* ── Screen (content inside the frame) ── */
+  .screen {
+    position: absolute;
+    top: 15px;
+    left: 17px;
+    right: 17px;
+    bottom: 15px;
+    border-radius: 50px;
+    overflow: hidden;
+    background: #fff;
+    z-index: 1;
+  }
+
+  .screen-content {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ── Map ── */
+  .map {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .map img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ── Map Pulse Animation ── */
+  .map-pulse {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 174px;
+    height: 174px;
+    z-index: 2;
+  }
+
+  .pulse-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: rgba(29, 150, 92, 0.15);
+    animation: pulse-expand 2.5s ease-out infinite;
+  }
+
+  .pulse-ring-inner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(29, 150, 92, 0.25);
+    animation: pulse-inner 2.5s ease-out infinite;
+  }
+
+  @keyframes pulse-expand {
+    0% { transform: scale(0.6); opacity: 0.8; }
+    50% { opacity: 0.4; }
+    100% { transform: scale(1.3); opacity: 0; }
+  }
+
+  @keyframes pulse-inner {
+    0% { transform: translate(-50%, -50%) scale(0.7); opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { transform: translate(-50%, -50%) scale(1.4); opacity: 0; }
+  }
+
+  /* ── Pickup Pin ── */
+  .pickup-pin {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -63px);
+    width: 48px;
+    height: 68px;
+    z-index: 3;
+  }
+
+  /* Layer 1 (bottom): Smart spot ring — green circle + white stroke + shadow */
+  .pin-smartspot {
+    position: absolute;
+    left: 50%;
+    top: 55px;
+    width: 20px;
+    height: 20px;
+    transform: translateX(-50%);
+  }
+
+  .pin-smartspot svg {
+    position: absolute;
+    /* overflow the 20px container to show the full 38px SVG with shadow */
+    left: -9px;
+    top: -9px;
+    width: 38px;
+    height: 38px;
+  }
+
+  /* Layer 2: White dot centered inside the smart spot ring */
+  .pin-dot {
+    position: absolute;
+    left: 50%;
+    top: 63px;
+    width: 12px;
+    height: 12px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: #fff;
+  }
+
+  /* Layer 3: Stem connecting head to base */
+  .pin-stem {
+    position: absolute;
+    left: 50%;
+    top: 45px;
+    width: 4px;
+    height: 20px;
+    transform: translateX(-50%);
+    background: #127042;
+    border-radius: 0 0 2px 2px;
+  }
+
+  /* Layer 4: Main green circle (head) */
+  .pin-head {
+    position: absolute;
+    left: 50%;
+    top: -2px;
+    width: 48px;
+    height: 48px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: #1D965C;
+  }
+
+  /* Layer 5 (top): White inner circle */
+  .pin-head-inner {
+    position: absolute;
+    left: 50%;
+    top: 14px;
+    width: 16px;
+    height: 16px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: #fff;
+  }
+
+  /* ── Blue Dot (Precise Location) ── */
+  .precise-location {
+    position: absolute;
+    top: 33%;
+    left: 62%;
+    width: 22px;
+    height: 22px;
+    z-index: 3;
+  }
+
+  .precise-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #4285F4;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+
+  /* ── Status Bar ── */
+  .status-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px 0;
+    z-index: 5;
+  }
+
+  .status-time {
+    font-size: 17px;
+    font-weight: 600;
+    color: #000;
+    letter-spacing: -0.34px;
+    font-family: 'SF Pro Text', 'Inter', -apple-system, sans-serif;
+  }
+
+  .status-icons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .status-icons svg {
+    display: block;
+  }
+
+  /* ── Close Button (FAB) ── */
+  .close-btn {
+    position: absolute;
+    top: 62px;
+    left: 16px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    z-index: 5;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .close-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+  }
+
+  .close-btn:active {
+    transform: scale(0.95);
+  }
+
+  .close-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* ── Bottom Sheet ── */
+  .bottom-sheet {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #fff;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -6px 24px rgba(0,0,0,0.15);
+    z-index: 8;
+    transition: top 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  /* ── Sheet Indicator (Drag Handle) ── */
+  .sheet-indicator {
+    display: flex;
+    justify-content: center;
+    padding: 9px 0;
+    cursor: grab;
+  }
+
+  .sheet-indicator:active {
+    cursor: grabbing;
+  }
+
+  .sheet-indicator-bar {
+    width: 48px;
+    height: 6px;
+    border-radius: 100px;
+    background: rgba(0,0,0,0.08);
+    backdrop-filter: blur(8px);
+  }
+
+  /* ── Matching Section ── */
+  .matching-section {
+    padding: 0 24px;
+  }
+
+  .matching-header {
+    padding-bottom: 0;
+  }
+
+  .matching-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #2F313F;
+    line-height: 30px;
+    letter-spacing: -0.48px;
+  }
+
+  /* ── Progress Steps ── */
+  .progress-steps {
+    padding: 12px 24px 4px;
+  }
+
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 0;
+    position: relative;
+  }
+
+  .step-connector {
+    position: absolute;
+    left: 11px;
+    top: 42px;
+    bottom: -6px;
+    width: 2px;
+    overflow: visible;
+  }
+
+  .step-connector svg {
+    position: absolute;
+    inset: 0;
+    width: 2px;
+    height: 100%;
+  }
+
+  .step-icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  /* ── Spinner ── */
+  .spinner {
+    position: absolute;
+    inset: 4.17%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .spinner svg {
+    width: 100%;
+    height: 100%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* ── Unchecked Circle ── */
+  .check-circle-unfilled {
+    position: absolute;
+    inset: 4.17%;
+  }
+
+  .check-circle-unfilled svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .step-label {
+    font-size: 16px;
+    line-height: 24px;
+    letter-spacing: -0.176px;
+    color: #191f1c;
+  }
+
+  .step-label.pending {
+    color: rgba(0,17,11,0.47);
+  }
+
+  .step-label {
+    transition: opacity 0.25s ease;
+  }
+
+  .step-label.hidden {
+    opacity: 0;
+  }
+
+  /* ── Step slide transitions ── */
+  .progress-steps {
+    overflow: hidden;
+  }
+
+  .step.slide-out-top {
+    animation: slideOutTop 0.4s ease-in forwards;
+  }
+
+  .step.slide-up {
+    animation: slideUp 0.4s ease-in-out forwards;
+  }
+
+  .step.slide-in-bottom {
+    animation: slideInBottom 0.4s ease-out forwards;
+  }
+
+  @keyframes slideOutTop {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(-48px); opacity: 0; }
+  }
+
+  @keyframes slideUp {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-48px); }
+  }
+
+  @keyframes slideInBottom {
+    0% { transform: translateY(48px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+
+  /* ── Check circle done (green checkmark) ── */
+  .check-circle-done {
+    position: absolute;
+    inset: 4.17%;
+  }
+
+  .check-circle-done svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Spinner closing animation: dasharray goes from 3/4 to full circle */
+  .spinner.closing svg circle {
+    animation: spinner-close 0.4s ease-out forwards;
+  }
+
+  .spinner.closing svg {
+    animation: none;
+  }
+
+  @keyframes spinner-close {
+    0% { stroke-dasharray: 47.12 15.71; }
+    100% { stroke-dasharray: 62.83 0; }
+  }
+
+  /* Checkmark fade in */
+  .check-circle-done .checkmark {
+    opacity: 0;
+    animation: checkmark-in 0.3s ease-out 0.15s forwards;
+  }
+
+  @keyframes checkmark-in {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+  /* Spinner opening: full grey circle opens into green 3/4 arc */
+  .spinner.opening svg circle {
+    animation: spinner-open 0.35s cubic-bezier(0.6, 0, 1, 1) forwards;
+  }
+
+  .spinner.opening svg {
+    animation: none;
+  }
+
+  @keyframes spinner-open {
+    0% { stroke-dasharray: 62.83 0; stroke-dashoffset: 0; stroke: #00110B; stroke-opacity: 0.47; }
+    100% { stroke-dasharray: 47.12 15.71; stroke-dashoffset: -15.71; stroke: #006E37; stroke-opacity: 0.83; }
+  }
+
+
+  /* ── Edit Pickup Link ── */
+  .edit-pickup-container {
+    padding: 8px 24px 24px;
+  }
+
+  .edit-pickup {
+    font-size: 16px;
+    font-weight: 600;
+    color: rgba(0,112,66,0.92);
+    letter-spacing: -0.18px;
+    line-height: 20px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: inherit;
+    padding: 0;
+    transition: opacity 0.15s;
+  }
+
+  .edit-pickup:hover {
+    opacity: 0.7;
+  }
+
+  /* ── Divider ── */
+  .divider {
+    height: 8px;
+    background: #F5F5F5;
+    position: relative;
+    overflow: visible;
+  }
+
+  .divider::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: #fff;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+  }
+
+  /* ── Route Section ── */
+  .route-section {
+    background: #fff;
+    border-radius: 16px;
+  }
+
+  .route-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 24px 24px 8px;
+  }
+
+  .route-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #191f1c;
+    line-height: 25px;
+    letter-spacing: -0.34px;
+  }
+
+  .route-edit {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1D965C;
+    letter-spacing: -0.18px;
+    line-height: 20px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: inherit;
+    transition: opacity 0.15s;
+  }
+
+  .route-edit:hover {
+    opacity: 0.7;
+  }
+
+  /* ── Route Items ── */
+  .route-items {
+    padding: 0 24px 12px;
+  }
+
+  .route-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-height: 48px;
+    padding: 12px 0;
+    position: relative;
+  }
+
+  .route-item-icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .route-connector {
+    position: absolute;
+    left: 12px;
+    top: 36px;
+    bottom: -24px;
+    width: 2px;
+    background: #EBEDEF;
+    z-index: 0;
+  }
+
+  /* Pickup dot */
+  .pickup-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2.5px solid #1A3A2A;
+    position: relative;
+  }
+
+  .pickup-dot::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #1A3A2A;
+  }
+
+  /* Add stop dot */
+  .add-stop-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid rgba(0,10,7,0.3);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .add-stop-dot svg {
+    width: 10px;
+    height: 10px;
+  }
+
+  /* Destination dot */
+  .destination-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #1A3A2A;
+    position: relative;
+  }
+
+  .destination-dot::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #fff;
+  }
+
+  .route-item-text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .route-item-primary {
+    font-size: 16px;
+    line-height: 20px;
+    letter-spacing: -0.176px;
+    color: #191f1c;
+  }
+
+  .route-item-secondary {
+    font-size: 16px;
+    line-height: 20px;
+    letter-spacing: -0.176px;
+    color: rgba(0,10,7,0.63);
+    margin-top: 4px;
+  }
+
+  .route-item-add {
+    font-size: 16px;
+    line-height: 24px;
+    letter-spacing: -0.176px;
+    color: rgba(0,10,7,0.63);
+    cursor: pointer;
+  }
+
+  .route-item-edit {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.15s;
+  }
+
+  .route-item-edit:hover {
+    opacity: 0.8;
+  }
+
+  /* ── Home Indicator ── */
+  .home-indicator {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 134px;
+    height: 5px;
+    border-radius: 100px;
+    background: #000;
+    z-index: 20;
+  }
+
+  /* ── Scrollbar hiding ── */
+  .bottom-sheet::-webkit-scrollbar {
+    display: none;
+  }
+  .bottom-sheet {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* ── Flow Buttons ── */
+  .flow-buttons {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 100;
+  }
+
+  .flow-btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #fff;
+    transition: opacity 0.15s, transform 0.1s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    text-align: left;
+    line-height: 1.4;
+  }
+
+  .flow-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+
+  .flow-btn:active {
+    transform: translateY(0);
+  }
+
+  .flow-btn-1 {
+    background: #2F313F;
+  }
+
+  .flow-btn-2 {
+    background: #2F313F;
+  }
+
+  .flow-btn.active {
+    background: #1D965C;
+  }
+
+  .flow-btn small {
+    display: block;
+    font-weight: 400;
+    opacity: 0.7;
+    font-size: 11px;
+    margin-top: 2px;
+  }
+</style>
+</head>
+<body>
+
+<div class="flow-buttons">
+  <button class="flow-btn flow-btn-1" id="flowBtn1" onclick="startFlow(1)">Flow 1<small>Driver found</small></button>
+  <button class="flow-btn flow-btn-2" id="flowBtn2" onclick="startFlow(2)">Flow 2<small>Confirmation fails</small></button>
+</div>
+
+<div class="phone-container">
+  <!-- iPhone Frame Overlay -->
+  <div class="phone-frame">
+    <img src="iphone-frame.png" alt="iPhone 15 Pro Frame">
+  </div>
+
+  <!-- Screen Content -->
+  <div class="screen">
+    <div class="screen-content">
+
+      <!-- Map Background -->
+      <div class="map">
+        <img src="map.png" alt="Map">
+      </div>
+
+      <!-- Map Pulse Animation -->
+      <div class="map-pulse">
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring" style="animation-delay: 1s;"></div>
+        <div class="pulse-ring-inner"></div>
+      </div>
+
+      <!-- Pickup Pin -->
+      <div class="pickup-pin">
+        <!-- Smart spot ring (ground indicator with shadow) -->
+        <div class="pin-smartspot">
+          <svg viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g filter="url(#pin-shadow)">
+              <circle cx="19" cy="17" r="10" fill="#1D965C"/>
+              <circle cx="19" cy="17" r="11.5" stroke="white" stroke-width="3"/>
+            </g>
+            <defs>
+              <filter id="pin-shadow" x="0" y="0" width="38" height="38" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                <feOffset dy="2"/>
+                <feGaussianBlur stdDeviation="3"/>
+                <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.16 0"/>
+                <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+                <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+              </filter>
+            </defs>
+          </svg>
+        </div>
+        <!-- White dot at base -->
+        <div class="pin-dot"></div>
+        <!-- Dark green stem -->
+        <div class="pin-stem"></div>
+        <!-- Main green circle -->
+        <div class="pin-head"></div>
+        <!-- White inner circle -->
+        <div class="pin-head-inner"></div>
+      </div>
+
+      <!-- Blue Dot (Precise Location) -->
+      <div class="precise-location">
+        <div class="precise-dot"></div>
+      </div>
+
+      <!-- Status Bar -->
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <!-- Cellular -->
+          <svg width="18" height="12" viewBox="0 0 18 12" fill="none">
+            <rect x="0" y="7" width="3" height="5" rx="0.5" fill="black"/>
+            <rect x="4.5" y="5" width="3" height="7" rx="0.5" fill="black"/>
+            <rect x="9" y="2.5" width="3" height="9.5" rx="0.5" fill="black"/>
+            <rect x="13.5" y="0" width="3" height="12" rx="0.5" fill="black"/>
+          </svg>
+          <!-- WiFi -->
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+            <path d="M8 3.6C10.1 3.6 12 4.4 13.4 5.7L14.8 4.3C13 2.6 10.6 1.6 8 1.6C5.4 1.6 3 2.6 1.2 4.3L2.6 5.7C4 4.4 5.9 3.6 8 3.6Z" fill="black"/>
+            <path d="M8 7.2C9.2 7.2 10.3 7.6 11.1 8.4L12.5 7C11.3 5.8 9.7 5.2 8 5.2C6.3 5.2 4.7 5.8 3.5 7L4.9 8.4C5.7 7.6 6.8 7.2 8 7.2Z" fill="black"/>
+            <circle cx="8" cy="10.5" r="1.5" fill="black"/>
+          </svg>
+          <!-- Battery -->
+          <svg width="27" height="13" viewBox="0 0 27 13" fill="none">
+            <rect x="0.5" y="0.5" width="22" height="12" rx="2.5" stroke="black" stroke-opacity="0.35"/>
+            <rect x="2" y="2" width="19" height="9" rx="1.5" fill="black"/>
+            <path d="M24 4.5V8.5C24.8 8.2 25.5 7.2 25.5 6.5C25.5 5.8 24.8 4.8 24 4.5Z" fill="black" fill-opacity="0.4"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Close Button -->
+      <button class="close-btn" onclick="handleClose()">
+        <svg viewBox="0 0 14 14" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round">
+          <line x1="1" y1="1" x2="13" y2="13"/>
+          <line x1="13" y1="1" x2="1" y2="13"/>
+        </svg>
+      </button>
+
+      <!-- Bottom Sheet -->
+      <div class="bottom-sheet" id="bottomSheet">
+        <!-- Drag Handle -->
+        <div class="sheet-indicator" id="sheetHandle">
+          <div class="sheet-indicator-bar"></div>
+        </div>
+
+        <!-- Matching Status -->
+        <div class="matching-section matching-header">
+          <div class="matching-title">Setting up your ride</div>
+        </div>
+
+        <!-- Progress Steps -->
+        <div class="progress-steps" id="progressSteps">
+          <!-- Step 1 -->
+          <div class="step" id="step1">
+            <div class="step-icon" id="step1Icon">
+              <div class="spinner">
+                <svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="11" cy="11" r="10" stroke="#006E37" stroke-opacity="0.83" stroke-width="2" stroke-linecap="round" stroke-dasharray="47.12 15.71" transform="rotate(-90 11 11)"/>
+                </svg>
+              </div>
+            </div>
+            <span class="step-label" id="step1Label">Looking for the right driver</span>
+            <div class="step-connector">
+              <svg viewBox="0 0 2 14" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                <path d="M1 1V13" stroke="#00140D" stroke-opacity="0.16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="step" id="step2">
+            <div class="step-icon" id="step2Icon">
+              <div class="check-circle-unfilled">
+                <svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M11 0C14.0373 0 16.7888 1.23217 18.7783 3.22168C20.7678 5.21119 22 7.96271 22 11C22 14.0373 20.7678 16.7888 18.7783 18.7783C16.7888 20.7678 14.0373 22 11 22C7.96271 22 5.21119 20.7678 3.22168 18.7783C1.23217 16.7888 0 14.0373 0 11C0 7.96271 1.23217 5.21119 3.22168 3.22168C5.21119 1.23217 7.96271 0 11 0ZM11 2C8.51444 2 6.26552 3.00597 4.63574 4.63574C3.00597 6.26552 2 8.51444 2 11C2 13.4856 3.00597 15.7345 4.63574 17.3643C6.26552 18.994 8.51444 20 11 20C13.4856 20 15.7345 18.994 17.3643 17.3643C18.994 15.7345 20 13.4856 20 11C20 8.51444 18.994 6.26552 17.3643 4.63574C15.7345 3.00597 13.4856 2 11 2Z" fill="#00110B" fill-opacity="0.47"/>
+                </svg>
+              </div>
+            </div>
+            <span class="step-label pending" id="step2Label">Driver confirmation</span>
+          </div>
+        </div>
+
+        <!-- Edit Pickup -->
+        <div class="edit-pickup-container">
+          <button class="edit-pickup" onclick="handleEditPickup()">Edit pickup</button>
+        </div>
+
+        <!-- Divider -->
+        <div class="divider"></div>
+
+        <!-- Route Section -->
+        <div class="route-section">
+          <div class="route-header">
+            <span class="route-title">Route</span>
+            <button class="route-edit" onclick="handleEditRoute()">Edit</button>
+          </div>
+
+          <div class="route-items">
+            <!-- Pickup Address -->
+            <div class="route-item">
+              <div class="route-item-icon">
+                <div class="pickup-dot"></div>
+                <div class="route-connector"></div>
+              </div>
+              <div class="route-item-text">
+                <div class="route-item-primary">Vana-L&#245;una 15</div>
+              </div>
+              <div class="route-item-edit">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <path d="M2 13.5V16h2.5l9.37-9.37-2.5-2.5L2 13.5zM15.71 4.04a.67.67 0 000-.94l-1.56-1.56a.67.67 0 00-.94 0l-1.22 1.22 2.5 2.5 1.22-1.22z" fill="#191f1c"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Add Stop -->
+            <div class="route-item" style="cursor: pointer;" onclick="handleAddStop()">
+              <div class="route-item-icon">
+                <div class="add-stop-dot">
+                  <svg viewBox="0 0 10 10" fill="none">
+                    <line x1="5" y1="1" x2="5" y2="9" stroke="rgba(0,10,7,0.4)" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="1" y1="5" x2="9" y2="5" stroke="rgba(0,10,7,0.4)" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <div class="route-connector"></div>
+              </div>
+              <span class="route-item-add">Add stop</span>
+            </div>
+
+            <!-- Destination Address -->
+            <div class="route-item">
+              <div class="route-item-icon">
+                <div class="destination-dot"></div>
+              </div>
+              <div class="route-item-text">
+                <div class="route-item-primary">Tartu maantee 2</div>
+                <div class="route-item-secondary">Arrive by 13:45</div>
+              </div>
+              <div class="route-item-edit">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <path d="M2 13.5V16h2.5l9.37-9.37-2.5-2.5L2 13.5zM15.71 4.04a.67.67 0 000-.94l-1.56-1.56a.67.67 0 00-.94 0l-1.22 1.22 2.5 2.5 1.22-1.22z" fill="#191f1c"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom safe area padding -->
+        <div style="height: 34px;"></div>
+      </div>
+
+      <!-- Home Indicator -->
+      <div class="home-indicator"></div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── SVG Templates ──
+  const SPINNER_SVG = `<svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="11" cy="11" r="10" stroke="#006E37" stroke-opacity="0.83" stroke-width="2" stroke-linecap="round" stroke-dasharray="47.12 15.71" transform="rotate(-90 11 11)"/>
+  </svg>`;
+
+  const UNFILLED_CIRCLE_SVG = `<svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M11 0C14.0373 0 16.7888 1.23217 18.7783 3.22168C20.7678 5.21119 22 7.96271 22 11C22 14.0373 20.7678 16.7888 18.7783 18.7783C16.7888 20.7678 14.0373 22 11 22C7.96271 22 5.21119 20.7678 3.22168 18.7783C1.23217 16.7888 0 14.0373 0 11C0 7.96271 1.23217 5.21119 3.22168 3.22168C5.21119 1.23217 7.96271 0 11 0ZM11 2C8.51444 2 6.26552 3.00597 4.63574 4.63574C3.00597 6.26552 2 8.51444 2 11C2 13.4856 3.00597 15.7345 4.63574 17.3643C6.26552 18.994 8.51444 20 11 20C13.4856 20 15.7345 18.994 17.3643 17.3643C18.994 15.7345 20 13.4856 20 11C20 8.51444 18.994 6.26552 17.3643 4.63574C15.7345 3.00597 13.4856 2 11 2Z" fill="#00110B" fill-opacity="0.47"/>
+  </svg>`;
+
+  const CHECK_DONE_SVG = `<svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M11 0C14.0373 0 16.7888 1.23217 18.7783 3.22168C20.7678 5.21119 22 7.96271 22 11C22 14.0373 20.7678 16.7888 18.7783 18.7783C16.7888 20.7678 14.0373 22 11 22C7.96271 22 5.21119 20.7678 3.22168 18.7783C1.23217 16.7888 0 14.0373 0 11C0 7.96271 1.23217 5.21119 3.22168 3.22168C5.21119 1.23217 7.96271 0 11 0ZM11 2C8.51444 2 6.26552 3.00597 4.63574 4.63574C3.00597 6.26552 2 8.51444 2 11C2 13.4856 3.00597 15.7345 4.63574 17.3643C6.26552 18.994 8.51444 20 11 20C13.4856 20 15.7345 18.994 17.3643 17.3643C18.994 15.7345 20 13.4856 20 11C20 8.51444 18.994 6.26552 17.3643 4.63574C15.7345 3.00597 13.4856 2 11 2Z" fill="#007042" fill-opacity="0.92"/>
+    <path class="checkmark" d="M14.8701 7.6123C15.2606 7.22181 15.8936 7.22189 16.2842 7.6123C16.6747 8.00283 16.6747 8.63584 16.2842 9.02637L10.8965 14.4141C10.1154 15.195 8.84938 15.1951 8.06836 14.4141L5.65039 11.9961C5.26024 11.6055 5.25999 10.9724 5.65039 10.582C6.04079 10.1916 6.6739 10.1919 7.06445 10.582L9.48242 13L14.8701 7.6123Z" fill="#007042" fill-opacity="0.92"/>
+  </svg>`;
+
+  const CLEAR_CIRCLE_SVG = `<svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M14.293 6.29297C14.6835 5.90244 15.3165 5.90244 15.707 6.29297C16.0976 6.68349 16.0976 7.31651 15.707 7.70703L12.4141 11L15.707 14.293C16.0976 14.6835 16.0976 15.3165 15.707 15.707C15.3165 16.0976 14.6835 16.0976 14.293 15.707L11 12.4141L7.70703 15.707C7.31651 16.0976 6.68349 16.0976 6.29297 15.707C5.90244 15.3165 5.90244 14.6835 6.29297 14.293L9.58594 11L6.29297 7.70703C5.90244 7.31651 5.90244 6.68349 6.29297 6.29297C6.68349 5.90244 7.31651 5.90244 7.70703 6.29297L11 9.58594L14.293 6.29297Z" fill="#00110B" fill-opacity="0.47"/>
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M11 0C17.0751 0 22 4.92487 22 11C22 17.0751 17.0751 22 11 22C4.92487 22 0 17.0751 0 11C0 4.92487 4.92487 0 11 0ZM11 2C6.02944 2 2 6.02944 2 11C2 15.9706 6.02944 20 11 20C15.9706 20 20 15.9706 20 11C20 6.02944 15.9706 2 11 2Z" fill="#00110B" fill-opacity="0.47"/>
+  </svg>`;
+
+  const CONNECTOR_SVG = `<svg viewBox="0 0 2 14" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><path d="M1 1V13" stroke="#00140D" stroke-opacity="0.16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+  // ── Bottom Sheet Drag ──
+  const sheet = document.getElementById('bottomSheet');
+  const handle = document.getElementById('sheetHandle');
+  let isDragging = false;
+  let startY = 0;
+  let startTranslate = 0;
+  const screenEl = document.querySelector('.screen-content');
+  const screenHeight = () => screenEl.getBoundingClientRect().height;
+
+  const SNAP_EXPANDED = 0.62;
+  const SNAP_COLLAPSED = 0.80;
+  let currentTop = SNAP_EXPANDED;
+
+  function setSheetPosition(topRatio) {
+    const top = topRatio * screenHeight();
+    sheet.style.transform = `translateY(0)`;
+    sheet.style.top = top + 'px';
+    sheet.style.bottom = '0';
+    currentTop = topRatio;
+  }
+
+  requestAnimationFrame(() => setSheetPosition(SNAP_EXPANDED));
+
+  handle.addEventListener('pointerdown', (e) => {
+    isDragging = true;
+    startY = e.clientY;
+    startTranslate = currentTop * screenHeight();
+    handle.setPointerCapture(e.pointerId);
+    sheet.style.transition = 'none';
+  });
+
+  handle.addEventListener('pointermove', (e) => {
+    if (!isDragging) return;
+    const dy = e.clientY - startY;
+    const newTop = Math.max(SNAP_EXPANDED * screenHeight(), Math.min(startTranslate + dy, SNAP_COLLAPSED * screenHeight()));
+    sheet.style.top = newTop + 'px';
+  });
+
+  handle.addEventListener('pointerup', (e) => {
+    if (!isDragging) return;
+    isDragging = false;
+    sheet.style.transition = 'top 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+    const currentPos = parseFloat(sheet.style.top) / screenHeight();
+    if (currentPos < (SNAP_EXPANDED + SNAP_COLLAPSED) / 2) {
+      setSheetPosition(SNAP_EXPANDED);
+    } else {
+      setSheetPosition(SNAP_COLLAPSED);
+    }
+  });
+
+  window.addEventListener('resize', () => setSheetPosition(currentTop));
+
+  // ── Flow Engine ──
+  let flowTimers = [];
+
+  function clearFlow() {
+    flowTimers.forEach(id => clearTimeout(id));
+    flowTimers = [];
+  }
+
+  function schedule(fn, delay) {
+    const id = setTimeout(fn, delay);
+    flowTimers.push(id);
+    return id;
+  }
+
+  function swapLabel(el, text, removePending) {
+    el.classList.add('hidden');
+    schedule(() => {
+      el.textContent = text;
+      if (removePending) el.classList.remove('pending');
+      el.classList.remove('hidden');
+    }, 250);
+  }
+
+  function resetSteps() {
+    const ps = document.getElementById('progressSteps');
+    ps.innerHTML = `
+      <div class="step" id="step1">
+        <div class="step-icon" id="step1Icon">
+          <div class="spinner">
+            ${SPINNER_SVG}
+          </div>
+        </div>
+        <span class="step-label" id="step1Label">Looking for the right driver</span>
+        <div class="step-connector">${CONNECTOR_SVG}</div>
+      </div>
+      <div class="step" id="step2">
+        <div class="step-icon" id="step2Icon">
+          <div class="check-circle-unfilled">${UNFILLED_CIRCLE_SVG}</div>
+        </div>
+        <span class="step-label pending" id="step2Label">Driver confirmation</span>
+      </div>
+    `;
+  }
+
+  // Animate spinner → checkmark on a given step icon
+  function spinnerToCheckmark(stepIcon, onDone) {
+    const spinnerEl = stepIcon.querySelector('.spinner');
+    spinnerEl.classList.add('closing');
+
+    schedule(() => {
+      stepIcon.innerHTML = '<div class="check-circle-done">' + CHECK_DONE_SVG + '</div>';
+      if (onDone) schedule(onDone, 450); // wait for checkmark fade-in (150ms delay + 300ms)
+    }, 400);
+  }
+
+  // Stage 1→2 transition: spinner closes, checkmark appears, step 2 activates
+  function runStage2(onComplete) {
+    const step1Icon = document.getElementById('step1Icon');
+    const step1Label = document.getElementById('step1Label');
+    const step2Icon = document.getElementById('step2Icon');
+    const step2Label = document.getElementById('step2Label');
+
+    spinnerToCheckmark(step1Icon);
+
+    schedule(() => {
+      swapLabel(step1Label, 'Driver found', true);
+      step2Icon.innerHTML = '<div class="spinner opening">' + SPINNER_SVG + '</div>';
+
+      schedule(() => {
+        const newSpinner = step2Icon.querySelector('.spinner');
+        const circle = newSpinner.querySelector('circle');
+        circle.setAttribute('stroke-dashoffset', '-15.71');
+        newSpinner.classList.remove('opening');
+        swapLabel(step2Label, 'Waiting for driver confirmation...', true);
+        if (onComplete) schedule(onComplete, 250);
+      }, 350);
+    }, 850);
+  }
+
+  // Stage 2 completion: spinner → checkmark on step 2, label updates
+  function runStage2Complete() {
+    const step2Icon = document.getElementById('step2Icon');
+    const step2Label = document.getElementById('step2Label');
+
+    spinnerToCheckmark(step2Icon, () => {
+      swapLabel(step2Label, 'Driver confirmed', true);
+    });
+  }
+
+  // Stage 2→3 transition: slide rows
+  function runStage3() {
+    const step1 = document.getElementById('step1');
+    const step2 = document.getElementById('step2');
+    const progressSteps = document.getElementById('progressSteps');
+
+    // Swap row 2 content to final state before animating
+    const s2Icon = step2.querySelector('.step-icon');
+    const s2Label = step2.querySelector('.step-label');
+    s2Icon.innerHTML = '<div class="check-circle-done">' + CLEAR_CIRCLE_SVG + '</div>';
+    s2Label.textContent = 'Confirmation unsuccessful';
+    s2Label.classList.add('pending');
+
+    const connector = document.createElement('div');
+    connector.className = 'step-connector';
+    connector.innerHTML = CONNECTOR_SVG;
+    step2.appendChild(connector);
+
+    const step3 = document.createElement('div');
+    step3.className = 'step slide-in-bottom';
+    step3.innerHTML = `
+      <div class="step-icon"><div class="spinner">${SPINNER_SVG}</div></div>
+      <span class="step-label">Looking for another driver</span>
+    `;
+
+    step1.classList.add('slide-out-top');
+    step2.classList.add('slide-up');
+    progressSteps.appendChild(step3);
+
+    schedule(() => {
+      step1.remove();
+      step2.classList.remove('slide-up');
+      step2.style.transform = 'none';
+      step2.offsetHeight;
+      step2.style.transform = '';
+      step3.classList.remove('slide-in-bottom');
+      step3.style.transform = '';
+    }, 400);
+  }
+
+  // ── Start Flow ──
+  function startFlow(flow) {
+    clearFlow();
+    resetSteps();
+
+    // Update active button
+    document.getElementById('flowBtn1').classList.toggle('active', flow === 1);
+    document.getElementById('flowBtn2').classList.toggle('active', flow === 2);
+
+    schedule(() => runStage2(
+      flow === 1 ? () => schedule(runStage2Complete, 2750) :
+      flow === 2 ? () => schedule(runStage3, 4000) : null
+    ), 3000);
+  }
+
+  // Auto-start flow 1
+  startFlow(1);
+
+  // ── Interactive handlers ──
+  function handleClose() {
+    const btn = document.querySelector('.close-btn');
+    btn.style.opacity = '0.5';
+    setTimeout(() => btn.style.opacity = '1', 200);
+  }
+  function handleEditPickup() { console.log('Edit pickup tapped'); }
+  function handleEditRoute() { console.log('Edit route tapped'); }
+  function handleAddStop() { console.log('Add stop tapped'); }
+</script>
+
+</body>
+</html>
