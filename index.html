@@ -448,7 +448,7 @@
 
   @keyframes slideInBottom {
     0% { transform: translateY(48px); opacity: 0; }
-    100% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(-48px); opacity: 1; }
   }
 
   /* ── Check circle done (green checkmark) ── */
@@ -1110,7 +1110,11 @@
     schedule(() => {
       el.textContent = text;
       if (removePending) el.classList.remove('pending');
-      el.classList.remove('hidden');
+      // Force browser to paint opacity:0 before triggering fade-in
+      el.offsetHeight;
+      requestAnimationFrame(() => {
+        el.classList.remove('hidden');
+      });
     }, 250);
   }
 
@@ -1180,8 +1184,8 @@
     });
   }
 
-  // Stage 2→3 transition: slide rows
-  function runStage3() {
+  // Generic slide transition: swaps row content, slides rows, calls onComplete after cleanup
+  function slideTransition(row1Icon, row1Label, row1Pending, newRowIcon, newRowLabel, onComplete) {
     const step1 = document.getElementById('step1');
     const step2 = document.getElementById('step2');
     const progressSteps = document.getElementById('progressSteps');
@@ -1189,9 +1193,10 @@
     // Swap row 2 content to final state before animating
     const s2Icon = step2.querySelector('.step-icon');
     const s2Label = step2.querySelector('.step-label');
-    s2Icon.innerHTML = '<div class="check-circle-done">' + CLEAR_CIRCLE_SVG + '</div>';
-    s2Label.textContent = 'Confirmation unsuccessful';
-    s2Label.classList.add('pending');
+    s2Icon.innerHTML = row1Icon;
+    s2Label.textContent = row1Label;
+    if (row1Pending) s2Label.classList.add('pending');
+    else s2Label.classList.remove('pending');
 
     const connector = document.createElement('div');
     connector.className = 'step-connector';
@@ -1201,9 +1206,12 @@
     const step3 = document.createElement('div');
     step3.className = 'step slide-in-bottom';
     step3.innerHTML = `
-      <div class="step-icon"><div class="spinner">${SPINNER_SVG}</div></div>
-      <span class="step-label">Looking for another driver</span>
+      <div class="step-icon">${newRowIcon}</div>
+      <span class="step-label">${newRowLabel}</span>
     `;
+
+    // Lock container height to prevent growth during animation
+    progressSteps.style.height = progressSteps.offsetHeight + 'px';
 
     step1.classList.add('slide-out-top');
     step2.classList.add('slide-up');
@@ -1212,12 +1220,44 @@
     schedule(() => {
       step1.remove();
       step2.classList.remove('slide-up');
+      step2.id = 'step1';
+      step2.querySelector('.step-icon').id = 'step1Icon';
+      step2.querySelector('.step-label').id = 'step1Label';
       step2.style.transform = 'none';
       step2.offsetHeight;
       step2.style.transform = '';
       step3.classList.remove('slide-in-bottom');
+      step3.id = 'step2';
+      step3.querySelector('.step-icon').id = 'step2Icon';
+      step3.querySelector('.step-label').id = 'step2Label';
       step3.style.transform = '';
+      progressSteps.style.height = '';
+      if (onComplete) onComplete();
     }, 400);
+  }
+
+  // Stage 2→3: confirmation unsuccessful, looking for another driver
+  function runStage3(onComplete) {
+    slideTransition(
+      '<div class="check-circle-done">' + CLEAR_CIRCLE_SVG + '</div>',
+      'Confirmation unsuccessful',
+      true,
+      '<div class="spinner">' + SPINNER_SVG + '</div>',
+      'Looking for another driver',
+      onComplete
+    );
+  }
+
+  // Stage 3→4: driver found, waiting for confirmation (same as state 2)
+  function runStage4(onComplete) {
+    slideTransition(
+      '<div class="check-circle-done">' + CHECK_DONE_SVG + '</div>',
+      'Driver found',
+      false,
+      '<div class="spinner">' + SPINNER_SVG + '</div>',
+      'Waiting for driver confirmation...',
+      onComplete
+    );
   }
 
   // ── Start Flow ──
@@ -1231,7 +1271,7 @@
 
     schedule(() => runStage2(
       flow === 1 ? () => schedule(runStage2Complete, 2750) :
-      flow === 2 ? () => schedule(runStage3, 4000) : null
+      flow === 2 ? () => schedule(() => runStage3(() => schedule(() => runStage4(() => schedule(runStage2Complete, 2750)), 4000)), 4000) : null
     ), 3000);
   }
 
