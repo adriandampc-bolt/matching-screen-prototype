@@ -742,6 +742,218 @@
     scrollbar-width: none;
   }
 
+  /* ── Active Ride Bottom Sheet ── */
+  .active-ride-sheet {
+    animation: sheetFadeIn 0.35s ease-out;
+  }
+
+  @keyframes sheetFadeIn {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  .pickup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 24px;
+  }
+
+  .pickup-info { flex: 1; }
+
+  .pickup-label {
+    font-size: 16px;
+    line-height: 20px;
+    color: #000;
+    letter-spacing: -0.176px;
+  }
+
+  .pickup-time {
+    font-size: 28px;
+    font-weight: 600;
+    color: #000;
+    line-height: 36px;
+    letter-spacing: -0.616px;
+    margin-top: 2px;
+  }
+
+  .car-driver {
+    position: relative;
+    width: 131px;
+    height: 82px;
+    flex-shrink: 0;
+  }
+
+  .car-img {
+    width: 131px;
+    height: 82px;
+    object-fit: contain;
+  }
+
+  .driver-avatar {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #fff;
+    padding: 2px;
+  }
+
+  .driver-avatar img {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+  }
+
+  .car-info {
+    padding: 0 24px;
+  }
+
+  .car-info-line {
+    font-size: 16px;
+    line-height: 20px;
+    color: #191f1c;
+    letter-spacing: -0.176px;
+  }
+
+  .car-info-line strong {
+    font-weight: 700;
+  }
+
+  .driver-info-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    font-size: 16px;
+    line-height: 20px;
+    color: rgba(0,10,7,0.63);
+    letter-spacing: -0.176px;
+  }
+
+  .rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: rgba(0,112,66,0.92);
+    font-weight: 600;
+  }
+
+  .rating svg { flex-shrink: 0; }
+
+  .notes-row {
+    display: flex;
+    gap: 8px;
+    padding: 0 24px;
+    margin-top: 16px;
+  }
+
+  .notes-input {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0,45,30,0.07);
+    border-radius: 12px;
+    padding: 10px 12px 10px 16px;
+    font-size: 16px;
+    color: rgba(0,10,7,0.63);
+    line-height: 24px;
+    letter-spacing: -0.176px;
+  }
+
+  .notes-send {
+    width: 20px;
+    height: 20px;
+    opacity: 0.5;
+  }
+
+  .call-btn {
+    width: 44px;
+    height: 44px;
+    background: rgba(0,45,30,0.07);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* ── Section card ── */
+  .section-card {
+    background: #fff;
+    border-radius: 16px;
+    padding-bottom: 12px;
+  }
+
+  .section-gap { height: 8px; background: #eef1f0; }
+
+  .section-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 24px 24px 8px;
+  }
+
+  .section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #191f1c;
+    line-height: 25px;
+    letter-spacing: -0.34px;
+  }
+
+  .section-action {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1D965C;
+    letter-spacing: -0.18px;
+    line-height: 20px;
+  }
+
+  .list-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 24px 8px;
+    min-height: 32px;
+    position: relative;
+  }
+
+  .list-item-text {
+    flex: 1;
+    font-size: 16px;
+    line-height: 20px;
+    color: #191f1c;
+    letter-spacing: -0.176px;
+  }
+
+  .list-item-secondary {
+    color: rgba(0,10,7,0.63);
+  }
+
+  .list-item-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 16px;
+    flex-shrink: 0;
+    opacity: 0.6;
+  }
+
+  .list-item-chevron {
+    width: 20px;
+    height: 20px;
+    margin-left: 8px;
+    opacity: 0.4;
+  }
+
+  .list-separator {
+    height: 1px;
+    background: rgba(0,45,30,0.07);
+    margin: 0 24px;
+  }
+
   /* ── Flow Buttons ── */
   .flow-buttons {
     position: fixed;
@@ -1181,7 +1393,142 @@
 
     spinnerToCheckmark(step2Icon, () => {
       swapLabel(step2Label, 'Driver confirmed', true);
+      schedule(runFinalStage, 1000);
     });
+  }
+
+  // Final stage: replace entire bottom sheet with active ride content
+  function runFinalStage() {
+    const sheet = document.getElementById('bottomSheet');
+    sheet.innerHTML = `
+      <div class="active-ride-sheet">
+        <!-- Drag Handle -->
+        <div style="display:flex;justify-content:center;padding:9px 0;">
+          <div style="width:48px;height:6px;border-radius:100px;background:rgba(0,0,0,0.08);"></div>
+        </div>
+
+        <!-- Pickup Section -->
+        <div style="background:#fff;padding-bottom:24px;border-radius:16px;">
+          <div class="pickup-header">
+            <div class="pickup-info">
+              <div class="pickup-label">Pickup in</div>
+              <div class="pickup-time">2 min</div>
+            </div>
+            <div class="car-driver">
+              <img class="car-img" src="car.png" alt="Car">
+              <div class="driver-avatar"><img src="driver.png" alt="Driver"></div>
+            </div>
+          </div>
+          <div class="car-info">
+            <div class="car-info-line"><strong>245 AWB</strong> · Grey · Toyota Corolla</div>
+            <div class="driver-info-line">
+              Alexander
+              <span class="rating">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1l2.12 4.3L15 6.1l-3.5 3.4.83 4.8L8 12.1l-4.33 2.2.83-4.8L1 6.1l4.88-.8L8 1z" fill="rgba(0,112,66,0.92)"/></svg>
+                4.9
+              </span>
+            </div>
+          </div>
+          <div class="notes-row">
+            <div class="notes-input">
+              <span>Any pickup notes?</span>
+              <svg class="notes-send" viewBox="0 0 20 20" fill="none"><path d="M17.5 10L2.5 2.5l2.5 7.5-2.5 7.5L17.5 10z" stroke="#191f1c" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="call-btn">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4.2 2.5c-.4 0-.7.3-.7.7C3.5 12 8 16.5 16.8 16.5c.4 0 .7-.3.7-.7v-3.1l-3.7-1.5-1.5 1.8c-2.5-1.2-4.3-3-5.5-5.5L8.6 6 7.1 2.5H4.2z" fill="#191f1c" opacity="0.7"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gap -->
+        <div class="section-gap"></div>
+
+        <!-- Route Section -->
+        <div class="section-card">
+          <div class="section-header-row">
+            <span class="section-title">Route</span>
+            <span class="section-action">Edit</span>
+          </div>
+          <div style="padding:0 24px;">
+            <div class="route-item">
+              <div class="route-item-icon">
+                <div class="pickup-dot"></div>
+                <div class="route-connector"></div>
+              </div>
+              <div class="route-item-text"><div class="route-item-primary">Vana-L&#245;una 15</div></div>
+            </div>
+            <div class="route-item">
+              <div class="route-item-icon">
+                <div class="destination-dot"></div>
+              </div>
+              <div class="route-item-text">
+                <div class="route-item-primary">Tartu maantee 2</div>
+                <div class="route-item-secondary">Arrive by 13:45</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gap -->
+        <div class="section-gap"></div>
+
+        <!-- Payment Section -->
+        <div class="section-card">
+          <div class="section-header-row">
+            <span class="section-title">Payment method</span>
+            <span class="section-action">Edit</span>
+          </div>
+          <div class="list-item">
+            <span class="list-item-text list-item-secondary">Fare · Bolt</span>
+            <span class="list-item-text" style="text-align:right;font-weight:600;">Price</span>
+          </div>
+          <div class="list-separator"></div>
+          <div class="list-item" style="padding-top:12px;">
+            <svg class="list-item-icon" viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="13" rx="2" stroke="#191f1c" stroke-width="1.5"/><path d="M3 10h18" stroke="#191f1c" stroke-width="1.5"/></svg>
+            <span class="list-item-text">•••• 5698</span>
+            <span style="font-weight:600;font-size:16px;color:#191f1c;">Price</span>
+          </div>
+        </div>
+
+        <!-- Gap -->
+        <div class="section-gap"></div>
+
+        <!-- More Section -->
+        <div class="section-card">
+          <div class="section-header-row">
+            <span class="section-title">More</span>
+          </div>
+          <div class="list-item">
+            <svg class="list-item-icon" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="#191f1c" stroke-width="1.5" stroke-linejoin="round"/><path d="M14 2v6h6M9 15l2 2 4-4" stroke="#191f1c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="list-item-text">Share trip details</span>
+            <svg class="list-item-chevron" viewBox="0 0 20 20" fill="none"><path d="M7.5 5l5 5-5 5" stroke="#191f1c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="list-separator"></div>
+          <div class="list-item">
+            <svg class="list-item-icon" viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 01-2.18 2A19.86 19.86 0 013.08 5.18 2 2 0 015.08 3h3a2 2 0 012 1.72c.13.96.36 1.9.7 2.81a2 2 0 01-.45 2.11L8.09 11.87a16 16 0 006.04 6.04l2.23-2.23a2 2 0 012.11-.45c.91.34 1.85.57 2.81.7a2 2 0 011.72 2z" stroke="#191f1c" stroke-width="1.5"/></svg>
+            <span class="list-item-text">Contact driver</span>
+            <svg class="list-item-chevron" viewBox="0 0 20 20" fill="none"><path d="M7.5 5l5 5-5 5" stroke="#191f1c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="list-separator"></div>
+          <div class="list-item">
+            <svg class="list-item-icon" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#191f1c" stroke-width="1.5"/><path d="M12 8v4M12 16h.01" stroke="#191f1c" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <span class="list-item-text">Call support</span>
+            <svg class="list-item-chevron" viewBox="0 0 20 20" fill="none"><path d="M7.5 5l5 5-5 5" stroke="#191f1c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="list-separator"></div>
+          <div class="list-item">
+            <svg class="list-item-icon" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#191f1c" stroke-width="1.5"/><path d="M15 9l-6 6M9 9l6 6" stroke="#191f1c" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <span class="list-item-text">Cancel trip</span>
+            <svg class="list-item-chevron" viewBox="0 0 20 20" fill="none"><path d="M7.5 5l5 5-5 5" stroke="#191f1c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+
+        <div style="height:34px;"></div>
+      </div>
+    `;
+    // Reposition sheet higher to show more content
+    sheet.style.transition = 'top 0.4s ease-out';
+    setSheetPosition(0.45);
   }
 
   // Generic slide transition: swaps row content, slides rows, calls onComplete after cleanup
