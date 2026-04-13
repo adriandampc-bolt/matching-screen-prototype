@@ -91,32 +91,22 @@
     position: absolute;
     inset: 0;
     border-radius: 50%;
-    background: rgba(29, 150, 92, 0.15);
-    animation: pulse-expand 2.5s ease-out infinite;
+    background: rgba(29, 150, 92, 0.18);
+    animation: pulse-expand 3s ease-out infinite both;
   }
 
-  .pulse-ring-inner {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    background: rgba(29, 150, 92, 0.25);
-    animation: pulse-inner 2.5s ease-out infinite;
+  .pulse-ring:nth-child(2) {
+    animation-delay: 0s;
+  }
+
+  .pulse-ring-delayed {
+    animation-delay: 1.5s !important;
   }
 
   @keyframes pulse-expand {
-    0% { transform: scale(0.6); opacity: 0.8; }
-    50% { opacity: 0.4; }
-    100% { transform: scale(1.3); opacity: 0; }
-  }
-
-  @keyframes pulse-inner {
-    0% { transform: translate(-50%, -50%) scale(0.7); opacity: 1; }
-    50% { opacity: 0.5; }
-    100% { transform: translate(-50%, -50%) scale(1.4); opacity: 0; }
+    0% { transform: scale(0); opacity: 0; }
+    3% { transform: scale(0.15); opacity: 0.85; }
+    100% { transform: scale(1.4); opacity: 0; }
   }
 
   /* ── Pickup Pin ── */
@@ -1040,8 +1030,8 @@
       <!-- Map Pulse Animation -->
       <div class="map-pulse">
         <div class="pulse-ring"></div>
-        <div class="pulse-ring" style="animation-delay: 1s;"></div>
-        <div class="pulse-ring-inner"></div>
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring pulse-ring-delayed"></div>
       </div>
 
       <!-- Pickup Pin -->
