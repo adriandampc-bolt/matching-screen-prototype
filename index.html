@@ -1253,7 +1253,7 @@
 
   // ── Bottom Sheet Drag ──
   const sheet = document.getElementById('bottomSheet');
-  const handle = document.getElementById('sheetHandle');
+  const originalSheetHTML = sheet.innerHTML;
   let isDragging = false;
   let startY = 0;
   let startTranslate = 0;
@@ -1289,22 +1289,23 @@
 
   requestAnimationFrame(() => positionSheetToClipRoute());
 
-  handle.addEventListener('pointerdown', (e) => {
+  sheet.addEventListener('pointerdown', (e) => {
+    if (!e.target.closest('.sheet-indicator, [style*="border-radius:100px"]')) return;
     isDragging = true;
     startY = e.clientY;
     startTranslate = currentTop * screenHeight();
-    handle.setPointerCapture(e.pointerId);
+    e.target.setPointerCapture(e.pointerId);
     sheet.style.transition = 'none';
   });
 
-  handle.addEventListener('pointermove', (e) => {
+  sheet.addEventListener('pointermove', (e) => {
     if (!isDragging) return;
     const dy = e.clientY - startY;
     const newTop = Math.max(SNAP_EXPANDED * screenHeight(), Math.min(startTranslate + dy, SNAP_COLLAPSED * screenHeight()));
     sheet.style.top = newTop + 'px';
   });
 
-  handle.addEventListener('pointerup', (e) => {
+  sheet.addEventListener('pointerup', (e) => {
     if (!isDragging) return;
     isDragging = false;
     sheet.style.transition = 'top 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
@@ -1625,6 +1626,7 @@
   // ── Start Flow ──
   function startFlow(flow) {
     clearFlow();
+    sheet.innerHTML = originalSheetHTML;
     resetSteps();
     requestAnimationFrame(() => positionSheetToClipRoute());
 
