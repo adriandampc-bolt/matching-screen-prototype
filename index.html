@@ -227,8 +227,8 @@
   }
 
   @keyframes car-pulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(29, 150, 92, 0.6); }
-    50% { box-shadow: 0 0 0 4px rgba(29, 150, 92, 0.3); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(29, 150, 92, 0.8); }
+    50% { box-shadow: 0 0 8px 6px rgba(29, 150, 92, 0.5); }
   }
 
   /* ── Status Bar ── */
@@ -1053,7 +1053,7 @@
       </div>
 
       <!-- Map Pulse Animation -->
-      <div class="map-pulse">
+      <div class="map-pulse" id="mapPulse">
         <div class="pulse-ring"></div>
         <div class="pulse-ring"></div>
         <div class="pulse-ring pulse-ring-delayed"></div>
@@ -1438,6 +1438,7 @@
         newSpinner.classList.remove('opening');
         swapLabel(step2Label, 'Waiting for driver confirmation...', true);
         document.getElementById('closestCar').classList.add('pulsating');
+        document.getElementById('mapPulse').style.display = 'none';
         if (onComplete) schedule(onComplete, 250);
       }, 350);
     }, 850);
@@ -1449,6 +1450,7 @@
     const step2Label = document.getElementById('step2Label');
     document.getElementById('closestCar').classList.remove('pulsating');
     document.getElementById('secondCar').classList.remove('pulsating');
+    document.getElementById('mapPulse').style.display = 'none';
 
     spinnerToCheckmark(step2Icon, () => {
       swapLabel(step2Label, 'Driver confirmed', true);
@@ -1645,6 +1647,7 @@
   // Stage 2→3: confirmation unsuccessful, looking for another driver
   function runStage3(onComplete) {
     document.getElementById('closestCar').classList.remove('pulsating');
+    document.getElementById('mapPulse').style.display = '';
     slideTransition(
       '<div class="check-circle-done">' + CLEAR_CIRCLE_SVG + '</div>',
       'Confirmation unsuccessful',
@@ -1658,6 +1661,7 @@
   // Stage 3→4: driver found, waiting for confirmation (same as state 2)
   function runStage4(onComplete) {
     document.getElementById('secondCar').classList.add('pulsating');
+    document.getElementById('mapPulse').style.display = 'none';
     slideTransition(
       '<div class="check-circle-done">' + CHECK_DONE_SVG + '</div>',
       'Driver found',
@@ -1673,6 +1677,7 @@
     clearFlow();
     document.getElementById('closestCar').classList.remove('pulsating');
     document.getElementById('secondCar').classList.remove('pulsating');
+    document.getElementById('mapPulse').style.display = '';
     sheet.innerHTML = originalSheetHTML;
     resetSteps(flow === 3);
     requestAnimationFrame(() => positionSheetToClipRoute());
