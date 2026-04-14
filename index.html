@@ -220,6 +220,16 @@
     object-fit: contain;
   }
 
+  .map-car.pulsating {
+    border-radius: 6px;
+    animation: car-pulse 1.2s ease-in-out infinite;
+  }
+
+  @keyframes car-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(29, 150, 92, 0.6); }
+    50% { box-shadow: 0 0 0 4px rgba(29, 150, 92, 0.3); }
+  }
+
   /* ── Status Bar ── */
   .status-bar {
     position: absolute;
@@ -1087,8 +1097,8 @@
 
       <!-- Map Car Icons -->
       <div class="map-car" style="top: 12%; left: 38%; transform: rotate(-30deg);"><img src="car-icon.png" alt=""></div>
-      <div class="map-car" style="top: 22%; left: 72%; transform: rotate(15deg);"><img src="car-icon.png" alt=""></div>
-      <div class="map-car" style="top: 45%; left: 25%; transform: rotate(-60deg);"><img src="car-icon.png" alt=""></div>
+      <div class="map-car" id="closestCar" style="top: 22%; left: 72%; transform: rotate(15deg);"><img src="car-icon.png" alt=""></div>
+      <div class="map-car" id="secondCar" style="top: 45%; left: 25%; transform: rotate(-60deg);"><img src="car-icon.png" alt=""></div>
       <div class="map-car" style="top: 55%; left: 65%; transform: rotate(45deg);"><img src="car-icon.png" alt=""></div>
       <div class="map-car" style="top: 38%; left: 82%; transform: rotate(-10deg);"><img src="car-icon.png" alt=""></div>
 
@@ -1426,6 +1436,7 @@
         circle.setAttribute('stroke-dashoffset', '-15.71');
         newSpinner.classList.remove('opening');
         swapLabel(step2Label, 'Waiting for driver confirmation...', true);
+        document.getElementById('closestCar').classList.add('pulsating');
         if (onComplete) schedule(onComplete, 250);
       }, 350);
     }, 850);
@@ -1435,6 +1446,8 @@
   function runStage2Complete() {
     const step2Icon = document.getElementById('step2Icon');
     const step2Label = document.getElementById('step2Label');
+    document.getElementById('closestCar').classList.remove('pulsating');
+    document.getElementById('secondCar').classList.remove('pulsating');
 
     spinnerToCheckmark(step2Icon, () => {
       swapLabel(step2Label, 'Driver confirmed', true);
@@ -1630,6 +1643,7 @@
 
   // Stage 2→3: confirmation unsuccessful, looking for another driver
   function runStage3(onComplete) {
+    document.getElementById('closestCar').classList.remove('pulsating');
     slideTransition(
       '<div class="check-circle-done">' + CLEAR_CIRCLE_SVG + '</div>',
       'Confirmation unsuccessful',
@@ -1642,6 +1656,7 @@
 
   // Stage 3→4: driver found, waiting for confirmation (same as state 2)
   function runStage4(onComplete) {
+    document.getElementById('secondCar').classList.add('pulsating');
     slideTransition(
       '<div class="check-circle-done">' + CHECK_DONE_SVG + '</div>',
       'Driver found',
@@ -1655,6 +1670,8 @@
   // ── Start Flow ──
   function startFlow(flow) {
     clearFlow();
+    document.getElementById('closestCar').classList.remove('pulsating');
+    document.getElementById('secondCar').classList.remove('pulsating');
     sheet.innerHTML = originalSheetHTML;
     resetSteps(flow === 3);
     requestAnimationFrame(() => positionSheetToClipRoute());
