@@ -190,8 +190,8 @@
   /* ── Blue Dot (Precise Location) ── */
   .precise-location {
     position: absolute;
-    top: 33%;
-    left: 62%;
+    top: 31%;
+    left: 53%;
     width: 22px;
     height: 22px;
     z-index: 3;
@@ -204,6 +204,20 @@
     background: #4285F4;
     border: 3px solid #fff;
     box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+
+  /* ── Map Car Icons ── */
+  .map-car {
+    position: absolute;
+    width: 14px;
+    height: 24px;
+    z-index: 2;
+  }
+
+  .map-car img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
   }
 
   /* ── Status Bar ── */
@@ -1070,6 +1084,13 @@
       <div class="precise-location">
         <div class="precise-dot"></div>
       </div>
+
+      <!-- Map Car Icons -->
+      <div class="map-car" style="top: 12%; left: 38%; transform: rotate(-30deg);"><img src="car-icon.png" alt=""></div>
+      <div class="map-car" style="top: 22%; left: 72%; transform: rotate(15deg);"><img src="car-icon.png" alt=""></div>
+      <div class="map-car" style="top: 45%; left: 25%; transform: rotate(-60deg);"><img src="car-icon.png" alt=""></div>
+      <div class="map-car" style="top: 55%; left: 65%; transform: rotate(45deg);"><img src="car-icon.png" alt=""></div>
+      <div class="map-car" style="top: 38%; left: 82%; transform: rotate(-10deg);"><img src="car-icon.png" alt=""></div>
 
       <!-- Status Bar -->
       <div class="status-bar">
