@@ -115,77 +115,60 @@
     position: absolute;
     top: 30%;
     left: 50%;
-    transform: translate(-50%, -63px);
-    width: 48px;
-    height: 68px;
     z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: translate(-50%, calc(-100% + 15px));
   }
 
-  /* Layer 1 (bottom): Smart spot ring — green circle + white stroke + shadow */
-  .pin-smartspot {
-    position: absolute;
-    left: 50%;
-    top: 55px;
-    width: 20px;
-    height: 20px;
-    transform: translateX(-50%);
+  .pin-bubble {
+    background: #2b8659;
+    border-radius: 8px;
+    padding: 7px 8px;
+    display: flex;
+    flex-direction: column;
+    white-space: nowrap;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.16);
   }
 
-  .pin-smartspot svg {
-    position: absolute;
-    /* overflow the 20px container to show the full 38px SVG with shadow */
-    left: -9px;
-    top: -9px;
-    width: 38px;
-    height: 38px;
+  .pin-label {
+    font-size: 12px;
+    line-height: 15px;
+    color: white;
   }
 
-  /* Layer 2: White dot centered inside the smart spot ring */
-  .pin-dot {
-    position: absolute;
-    left: 50%;
-    top: 63px;
-    width: 12px;
-    height: 12px;
-    transform: translate(-50%, -50%);
+  .pin-title {
+    font-size: 14px;
+    line-height: 18px;
+    color: white;
+    font-weight: 600;
+    letter-spacing: -0.084px;
+  }
+
+  .pin-pointer {
+    display: block;
+    margin-top: -1px;
+  }
+
+  .pin-base-ring {
+    margin-top: 5px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
-    background: #fff;
+    background: #2b8659;
+    border: 3px solid white;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.16);
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  /* Layer 3: Stem connecting head to base */
-  .pin-stem {
-    position: absolute;
-    left: 50%;
-    top: 45px;
-    width: 4px;
-    height: 20px;
-    transform: translateX(-50%);
-    background: #127042;
-    border-radius: 0 0 2px 2px;
-  }
-
-  /* Layer 4: Main green circle (head) */
-  .pin-head {
-    position: absolute;
-    left: 50%;
-    top: -2px;
-    width: 48px;
-    height: 48px;
-    transform: translateX(-50%);
+  .pin-base-dot {
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    background: #1D965C;
-  }
-
-  /* Layer 5 (top): White inner circle */
-  .pin-head-inner {
-    position: absolute;
-    left: 50%;
-    top: 14px;
-    width: 16px;
-    height: 16px;
-    transform: translateX(-50%);
-    border-radius: 50%;
-    background: #fff;
+    background: white;
   }
 
   /* ── Blue Dot (Precise Location) ── */
@@ -1061,34 +1044,16 @@
 
       <!-- Pickup Pin -->
       <div class="pickup-pin">
-        <!-- Smart spot ring (ground indicator with shadow) -->
-        <div class="pin-smartspot">
-          <svg viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <g filter="url(#pin-shadow)">
-              <circle cx="19" cy="17" r="10" fill="#1D965C"/>
-              <circle cx="19" cy="17" r="11.5" stroke="white" stroke-width="3"/>
-            </g>
-            <defs>
-              <filter id="pin-shadow" x="0" y="0" width="38" height="38" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-                <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-                <feOffset dy="2"/>
-                <feGaussianBlur stdDeviation="3"/>
-                <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.16 0"/>
-                <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
-                <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
-              </filter>
-            </defs>
-          </svg>
+        <div class="pin-bubble">
+          <span class="pin-label">Pickup here</span>
+          <span class="pin-title">Tap to edit</span>
         </div>
-        <!-- White dot at base -->
-        <div class="pin-dot"></div>
-        <!-- Dark green stem -->
-        <div class="pin-stem"></div>
-        <!-- Main green circle -->
-        <div class="pin-head"></div>
-        <!-- White inner circle -->
-        <div class="pin-head-inner"></div>
+        <svg class="pin-pointer" width="20" height="8" viewBox="0 0 20 8" fill="none">
+          <path d="M0 0C4 0 7.5 4 10 8C12.5 4 16 0 20 0H0Z" fill="#2b8659"/>
+        </svg>
+        <div class="pin-base-ring">
+          <div class="pin-base-dot"></div>
+        </div>
       </div>
 
       <!-- Blue Dot (Precise Location) -->
