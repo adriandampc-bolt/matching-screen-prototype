@@ -1033,7 +1033,7 @@
   }
 
   .food-card {
-    flex: 0 0 160px;
+    flex: 0 0 210px;
   }
 
   .food-card-img {
@@ -1166,6 +1166,10 @@
     background: #2F313F;
   }
 
+  .flow-btn-5 {
+    background: #2F313F;
+  }
+
   .flow-btn.active {
     background: #1D965C;
   }
@@ -1186,6 +1190,7 @@
   <button class="flow-btn flow-btn-2" id="flowBtn2" onclick="startFlow(2)">Flow 2<small>Confirmation fails</small></button>
   <button class="flow-btn flow-btn-3" id="flowBtn3" onclick="startFlow(3)">Flow 3<small>Single step</small></button>
   <button class="flow-btn flow-btn-4" id="flowBtn4" onclick="startFlow(4)">Flow 4<small>Single step</small></button>
+  <button class="flow-btn flow-btn-5" id="flowBtn5" onclick="startFlow(5)">Flow 5<small>Food from start</small></button>
 </div>
 
 <div class="phone-container">
@@ -1337,37 +1342,48 @@
           <div class="food-promo-subtitle">Fresh food delivered to your destination</div>
           <div class="food-cards">
             <div class="food-card">
-              <div class="food-card-img" style="background: linear-gradient(145deg, #3d2010 0%, #8B5E3C 40%, #D2691E 100%);">
-                <div class="food-card-badge">-25%</div>
+              <div class="food-card-img" style="background-image: url('food-burger-town.jpg');">
+                <div class="food-card-badge">&ndash;25%</div>
                 <div class="food-card-rating">
                   <svg viewBox="0 0 12 12" fill="#191f1c"><path d="M6 0l1.76 3.57L12 4.16 8.88 7.2l.74 4.3L6 9.47 2.38 11.5l.74-4.3L0 4.16l4.24-.59z"/></svg>
-                  4.6 (200+)
+                  <span>4.6</span> <span style="font-weight:400">(200+)</span>
                 </div>
               </div>
               <div class="food-card-name">Burger Town</div>
               <div class="food-card-meta"><span class="price-new">1,50 &euro;</span> <span class="price-old">3,50 &euro;</span> &middot; 10&ndash;15 min</div>
             </div>
             <div class="food-card">
-              <div class="food-card-img" style="background: linear-gradient(145deg, #8B2500 0%, #CC5500 40%, #FF6B35 100%);">
-                <div class="food-card-badge">-25%</div>
+              <div class="food-card-img" style="background-image: url('food-pizza-corner.jpg');">
+                <div class="food-card-badge">&ndash;25%</div>
                 <div class="food-card-rating">
                   <svg viewBox="0 0 12 12" fill="#191f1c"><path d="M6 0l1.76 3.57L12 4.16 8.88 7.2l.74 4.3L6 9.47 2.38 11.5l.74-4.3L0 4.16l4.24-.59z"/></svg>
-                  4.3 (150+)
+                  <span>4.6</span> <span style="font-weight:400">(200+)</span>
                 </div>
               </div>
               <div class="food-card-name">Pizza Corner</div>
               <div class="food-card-meta"><span class="price-new">0 &euro;</span> <span class="price-old">3,50 &euro;</span> &middot; 10&ndash;15 min</div>
             </div>
             <div class="food-card">
-              <div class="food-card-img" style="background: linear-gradient(145deg, #2E5A1C 0%, #4A7C32 40%, #7AB648 100%);">
-                <div class="food-card-badge">-15%</div>
+              <div class="food-card-img" style="background-image: url('food-poke-bowl-1.png');">
+                <div class="food-card-badge">&ndash;25%</div>
                 <div class="food-card-rating">
                   <svg viewBox="0 0 12 12" fill="#191f1c"><path d="M6 0l1.76 3.57L12 4.16 8.88 7.2l.74 4.3L6 9.47 2.38 11.5l.74-4.3L0 4.16l4.24-.59z"/></svg>
-                  4.8 (90+)
+                  <span>4.6</span> <span style="font-weight:400">(200+)</span>
                 </div>
               </div>
-              <div class="food-card-name">Salad Garden</div>
-              <div class="food-card-meta"><span class="price-new">2,00 &euro;</span> <span class="price-old">4,00 &euro;</span> &middot; 15&ndash;20 min</div>
+              <div class="food-card-name">Poke Bowl Hariduse</div>
+              <div class="food-card-meta"><span class="price-new">1,50 &euro;</span> <span class="price-old">3,50 &euro;</span> &middot; 10&ndash;15 min</div>
+            </div>
+            <div class="food-card">
+              <div class="food-card-img" style="background-image: url('food-poke-bowl-2.jpg');">
+                <div class="food-card-badge">&ndash;25%</div>
+                <div class="food-card-rating">
+                  <svg viewBox="0 0 12 12" fill="#191f1c"><path d="M6 0l1.76 3.57L12 4.16 8.88 7.2l.74 4.3L6 9.47 2.38 11.5l.74-4.3L0 4.16l4.24-.59z"/></svg>
+                  <span>4.6</span> <span style="font-weight:400">(200+)</span>
+                </div>
+              </div>
+              <div class="food-card-name">Poke Bowl Kristiine</div>
+              <div class="food-card-meta"><span class="price-new">0 &euro;</span> <span class="price-old">3,50 &euro;</span> &middot; 10&ndash;15 min</div>
             </div>
           </div>
           <button class="food-promo-btn">Open Bolt Food</button>
@@ -1897,7 +1913,7 @@
     document.getElementById('secondCar').classList.remove('pulsating');
     document.getElementById('mapPulse').style.display = '';
     sheet.innerHTML = originalSheetHTML;
-    resetSteps(flow === 3 || flow === 4);
+    resetSteps(flow === 3 || flow === 4 || flow === 5);
     startMatchingTimer();
     requestAnimationFrame(() => positionSheetToClipRoute());
 
@@ -1906,6 +1922,7 @@
     document.getElementById('flowBtn2').classList.toggle('active', flow === 2);
     document.getElementById('flowBtn3').classList.toggle('active', flow === 3);
     document.getElementById('flowBtn4').classList.toggle('active', flow === 4);
+    document.getElementById('flowBtn5').classList.toggle('active', flow === 5);
 
     if (flow === 3) {
       // Flow 3: single step with label changes, then driver found + final screen
@@ -1934,6 +1951,29 @@
           requestAnimationFrame(() => positionSheetToClipRoute());
         }
 
+        swapLabel(document.getElementById('step1Label'), 'Almost there', false);
+        schedule(() => {
+          swapLabel(document.getElementById('step1Label'), 'Matching takes longer than expected', false);
+          schedule(() => {
+            spinnerToCheckmark(document.getElementById('step1Icon'), () => {
+              swapLabel(document.getElementById('step1Label'), 'Driver found', false);
+              schedule(runFinalStage, 1000);
+            });
+          }, 6000);
+        }, 6000);
+      }, 6000);
+      return;
+    }
+
+    if (flow === 5) {
+      // Flow 5: single step + food promo visible from start, then driver found + final screen
+      const promo = document.getElementById('foodPromo');
+      if (promo) {
+        promo.classList.add('visible');
+        requestAnimationFrame(() => positionSheetToClipRoute());
+      }
+
+      schedule(() => {
         swapLabel(document.getElementById('step1Label'), 'Almost there', false);
         schedule(() => {
           swapLabel(document.getElementById('step1Label'), 'Matching takes longer than expected', false);
