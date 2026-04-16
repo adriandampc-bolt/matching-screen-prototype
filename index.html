@@ -1998,9 +1998,26 @@
     if (flow === 5) {
       // Flow 5: single step + food promo visible from start, then driver found + final screen
       const promo = document.getElementById('foodPromo');
+      const mc = document.getElementById('mapContent');
       if (promo) {
         promo.classList.add('visible');
-        requestAnimationFrame(() => shiftMapForPromo());
+        if (mc) mc.style.transition = 'none';
+        requestAnimationFrame(() => {
+          // Temporarily hide promo to measure non-promo sheet position
+          promo.style.display = 'none';
+          positionSheetToClipRoute();
+          const nonPromoTop = currentTop;
+          // Restore promo and reposition
+          promo.style.display = '';
+          positionSheetToClipRoute();
+          const promoTop = currentTop;
+          // Apply map shift instantly
+          const shiftPx = (nonPromoTop - promoTop) * screenHeight();
+          if (mc && shiftPx > 0) {
+            mc.style.transform = 'translateY(-' + (shiftPx / 3) + 'px)';
+          }
+          requestAnimationFrame(() => { if (mc) mc.style.transition = ''; });
+        });
       }
 
       schedule(() => {
