@@ -1935,106 +1935,108 @@
     );
   }
 
+  // ── Flow Config ──
+  const FLOW_CONFIG = {
+    1: { singleStep: false, foodPromo: false },
+    2: { singleStep: false, foodPromo: false },
+    3: { singleStep: true,  foodPromo: false },
+    4: { singleStep: true,  foodPromo: 'delayed' },
+    5: { singleStep: true,  foodPromo: 'immediate' },
+  };
+
+  function runSingleStepFlow() {
+    schedule(() => {
+      swapLabel(document.getElementById('step1Label'), 'Almost there', false);
+      schedule(() => {
+        swapLabel(document.getElementById('step1Label'), 'Matching takes longer than expected', false);
+        schedule(() => {
+          spinnerToCheckmark(document.getElementById('step1Icon'), () => {
+            swapLabel(document.getElementById('step1Label'), 'Driver found', false);
+            schedule(runFinalStage, 1000);
+          });
+        }, 6000);
+      }, 6000);
+    }, 6000);
+  }
+
+  function showFoodPromoDelayed() {
+    const promo = document.getElementById('foodPromo');
+    if (promo) {
+      promo.classList.add('visible');
+      requestAnimationFrame(() => shiftMapForPromo());
+    }
+  }
+
+  function showFoodPromoImmediate() {
+    const promo = document.getElementById('foodPromo');
+    const mc = document.getElementById('mapContent');
+    if (promo) {
+      promo.classList.add('visible');
+      if (mc) mc.style.transition = 'none';
+      requestAnimationFrame(() => {
+        promo.style.display = 'none';
+        positionSheetToClipRoute();
+        const nonPromoTop = currentTop;
+        promo.style.display = '';
+        positionSheetToClipRoute();
+        const promoTop = currentTop;
+        const shiftPx = (nonPromoTop - promoTop) * screenHeight();
+        if (mc && shiftPx > 0) {
+          mc.style.transform = 'translateY(-' + (shiftPx / 3) + 'px)';
+        }
+        requestAnimationFrame(() => { if (mc) mc.style.transition = ''; });
+      });
+    }
+  }
+
   // ── Start Flow ──
   function startFlow(flow) {
+    const config = FLOW_CONFIG[flow];
     clearFlow();
     document.getElementById('closestCar').classList.remove('pulsating');
     document.getElementById('secondCar').classList.remove('pulsating');
     document.getElementById('mapPulse').style.display = '';
     resetMapShift();
     sheet.innerHTML = originalSheetHTML;
-    resetSteps(flow === 3 || flow === 4 || flow === 5);
+    resetSteps(config.singleStep);
     startMatchingTimer();
     requestAnimationFrame(() => positionSheetToClipRoute());
 
     // Update active button
-    document.getElementById('flowBtn1').classList.toggle('active', flow === 1);
-    document.getElementById('flowBtn2').classList.toggle('active', flow === 2);
-    document.getElementById('flowBtn3').classList.toggle('active', flow === 3);
-    document.getElementById('flowBtn4').classList.toggle('active', flow === 4);
-    document.getElementById('flowBtn5').classList.toggle('active', flow === 5);
+    Object.keys(FLOW_CONFIG).forEach(f => {
+      document.getElementById('flowBtn' + f).classList.toggle('active', flow === +f);
+    });
 
-    if (flow === 3) {
-      // Flow 3: single step with label changes, then driver found + final screen
-      schedule(() => {
-        swapLabel(document.getElementById('step1Label'), 'Almost there', false);
-        schedule(() => {
-          swapLabel(document.getElementById('step1Label'), 'Matching takes longer than expected', false);
-          schedule(() => {
-            spinnerToCheckmark(document.getElementById('step1Icon'), () => {
-              swapLabel(document.getElementById('step1Label'), 'Driver found', false);
-              schedule(runFinalStage, 1000);
-            });
-          }, 6000);
-        }, 6000);
-      }, 6000);
-      return;
+    // Food promo: immediate
+    if (config.foodPromo === 'immediate') {
+      showFoodPromoImmediate();
     }
 
-    if (flow === 4) {
-      // Flow 4: single step + food promo after 6s, then driver found + final screen
-      schedule(() => {
-        // Show food promo after 6 seconds, reposition sheet and shift map
-        const promo = document.getElementById('foodPromo');
-        if (promo) {
-          promo.classList.add('visible');
-          requestAnimationFrame(() => shiftMapForPromo());
-        }
-
-        swapLabel(document.getElementById('step1Label'), 'Almost there', false);
+    // Single-step flows
+    if (config.singleStep) {
+      if (config.foodPromo === 'delayed') {
+        // Show food promo at the first stage transition
         schedule(() => {
-          swapLabel(document.getElementById('step1Label'), 'Matching takes longer than expected', false);
+          showFoodPromoDelayed();
+          // Continue single-step sequence inline (first label already swaps here)
+          swapLabel(document.getElementById('step1Label'), 'Almost there', false);
           schedule(() => {
-            spinnerToCheckmark(document.getElementById('step1Icon'), () => {
-              swapLabel(document.getElementById('step1Label'), 'Driver found', false);
-              schedule(runFinalStage, 1000);
-            });
+            swapLabel(document.getElementById('step1Label'), 'Matching takes longer than expected', false);
+            schedule(() => {
+              spinnerToCheckmark(document.getElementById('step1Icon'), () => {
+                swapLabel(document.getElementById('step1Label'), 'Driver found', false);
+                schedule(runFinalStage, 1000);
+              });
+            }, 6000);
           }, 6000);
         }, 6000);
-      }, 6000);
-      return;
-    }
-
-    if (flow === 5) {
-      // Flow 5: single step + food promo visible from start, then driver found + final screen
-      const promo = document.getElementById('foodPromo');
-      const mc = document.getElementById('mapContent');
-      if (promo) {
-        promo.classList.add('visible');
-        if (mc) mc.style.transition = 'none';
-        requestAnimationFrame(() => {
-          // Temporarily hide promo to measure non-promo sheet position
-          promo.style.display = 'none';
-          positionSheetToClipRoute();
-          const nonPromoTop = currentTop;
-          // Restore promo and reposition
-          promo.style.display = '';
-          positionSheetToClipRoute();
-          const promoTop = currentTop;
-          // Apply map shift instantly
-          const shiftPx = (nonPromoTop - promoTop) * screenHeight();
-          if (mc && shiftPx > 0) {
-            mc.style.transform = 'translateY(-' + (shiftPx / 3) + 'px)';
-          }
-          requestAnimationFrame(() => { if (mc) mc.style.transition = ''; });
-        });
+      } else {
+        runSingleStepFlow();
       }
-
-      schedule(() => {
-        swapLabel(document.getElementById('step1Label'), 'Almost there', false);
-        schedule(() => {
-          swapLabel(document.getElementById('step1Label'), 'Matching takes longer than expected', false);
-          schedule(() => {
-            spinnerToCheckmark(document.getElementById('step1Icon'), () => {
-              swapLabel(document.getElementById('step1Label'), 'Driver found', false);
-              schedule(runFinalStage, 1000);
-            });
-          }, 6000);
-        }, 6000);
-      }, 6000);
       return;
     }
 
+    // Multi-step flows (1 & 2)
     schedule(() => runStage2(
       flow === 1 ? () => schedule(runStage2Complete, 2750) :
       flow === 2 ? () => schedule(() => runStage3(() => schedule(() => runStage4(() => schedule(runStage2Complete, 2750)), 4000)), 4000) : null
