@@ -60,6 +60,16 @@
     overflow: hidden;
   }
 
+  /* ── Map Content Wrapper ── */
+  .map-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
   /* ── Map ── */
   .map {
     position: absolute;
@@ -1203,43 +1213,46 @@
   <div class="screen">
     <div class="screen-content">
 
-      <!-- Map Background -->
-      <div class="map">
-        <img src="map.png" alt="Map">
-      </div>
-
-      <!-- Map Pulse Animation -->
-      <div class="map-pulse" id="mapPulse">
-        <div class="pulse-ring"></div>
-        <div class="pulse-ring"></div>
-        <div class="pulse-ring pulse-ring-delayed"></div>
-      </div>
-
-      <!-- Pickup Pin -->
-      <div class="pickup-pin">
-        <div class="pin-bubble">
-          <span class="pin-label">Pickup here</span>
-          <span class="pin-title">Tap to edit</span>
+      <!-- Map Content (shifts when food promo visible) -->
+      <div class="map-content" id="mapContent">
+        <!-- Map Background -->
+        <div class="map">
+          <img src="map.png" alt="Map">
         </div>
-        <svg class="pin-pointer" width="20" height="8" viewBox="0 0 20 8" fill="none">
-          <path d="M0 0C4 0 7.5 4 10 8C12.5 4 16 0 20 0H0Z" fill="#2b8659"/>
-        </svg>
-        <div class="pin-base-ring">
-          <div class="pin-base-dot"></div>
+
+        <!-- Map Pulse Animation -->
+        <div class="map-pulse" id="mapPulse">
+          <div class="pulse-ring"></div>
+          <div class="pulse-ring"></div>
+          <div class="pulse-ring pulse-ring-delayed"></div>
         </div>
-      </div>
 
-      <!-- Blue Dot (Precise Location) -->
-      <div class="precise-location">
-        <div class="precise-dot"></div>
-      </div>
+        <!-- Pickup Pin -->
+        <div class="pickup-pin">
+          <div class="pin-bubble">
+            <span class="pin-label">Pickup here</span>
+            <span class="pin-title">Tap to edit</span>
+          </div>
+          <svg class="pin-pointer" width="20" height="8" viewBox="0 0 20 8" fill="none">
+            <path d="M0 0C4 0 7.5 4 10 8C12.5 4 16 0 20 0H0Z" fill="#2b8659"/>
+          </svg>
+          <div class="pin-base-ring">
+            <div class="pin-base-dot"></div>
+          </div>
+        </div>
 
-      <!-- Map Car Icons -->
-      <div class="map-car" style="top: 11%; left: 38%; transform: rotate(25deg);"><img src="car-icon.png" alt=""></div>
-      <div class="map-car" id="closestCar" style="top: 23.5%; left: 72%; transform: rotate(65deg);"><img src="car-icon.png" alt=""></div>
-      <div class="map-car" id="secondCar" style="top: 45%; left: 25%; transform: rotate(180deg);"><img src="car-icon.png" alt=""></div>
-      <div class="map-car" style="top: 55%; left: 67%; transform: rotate(45deg);"><img src="car-icon.png" alt=""></div>
-      <div class="map-car" style="top: 38%; left: 79%; transform: rotate(-10deg);"><img src="car-icon.png" alt=""></div>
+        <!-- Blue Dot (Precise Location) -->
+        <div class="precise-location">
+          <div class="precise-dot"></div>
+        </div>
+
+        <!-- Map Car Icons -->
+        <div class="map-car" style="top: 11%; left: 38%; transform: rotate(25deg);"><img src="car-icon.png" alt=""></div>
+        <div class="map-car" id="closestCar" style="top: 23.5%; left: 72%; transform: rotate(65deg);"><img src="car-icon.png" alt=""></div>
+        <div class="map-car" id="secondCar" style="top: 45%; left: 25%; transform: rotate(180deg);"><img src="car-icon.png" alt=""></div>
+        <div class="map-car" style="top: 55%; left: 67%; transform: rotate(45deg);"><img src="car-icon.png" alt=""></div>
+        <div class="map-car" style="top: 38%; left: 79%; transform: rotate(-10deg);"><img src="car-icon.png" alt=""></div>
+      </div>
 
       <!-- Status Bar -->
       <div class="status-bar">
@@ -1587,6 +1600,22 @@
     flowTimers = [];
   }
 
+  function shiftMapForPromo() {
+    const oldTop = currentTop;
+    positionSheetToClipRoute();
+    const newTop = currentTop;
+    const shiftPx = (oldTop - newTop) * screenHeight();
+    const mapContent = document.getElementById('mapContent');
+    if (mapContent && shiftPx > 0) {
+      mapContent.style.transform = 'translateY(-' + (shiftPx / 3) + 'px)';
+    }
+  }
+
+  function resetMapShift() {
+    const mapContent = document.getElementById('mapContent');
+    if (mapContent) mapContent.style.transform = '';
+  }
+
   function schedule(fn, delay) {
     const id = setTimeout(fn, delay);
     flowTimers.push(id);
@@ -1912,6 +1941,7 @@
     document.getElementById('closestCar').classList.remove('pulsating');
     document.getElementById('secondCar').classList.remove('pulsating');
     document.getElementById('mapPulse').style.display = '';
+    resetMapShift();
     sheet.innerHTML = originalSheetHTML;
     resetSteps(flow === 3 || flow === 4 || flow === 5);
     startMatchingTimer();
@@ -1944,11 +1974,11 @@
     if (flow === 4) {
       // Flow 4: single step + food promo after 6s, then driver found + final screen
       schedule(() => {
-        // Show food promo after 6 seconds and reposition sheet
+        // Show food promo after 6 seconds, reposition sheet and shift map
         const promo = document.getElementById('foodPromo');
         if (promo) {
           promo.classList.add('visible');
-          requestAnimationFrame(() => positionSheetToClipRoute());
+          requestAnimationFrame(() => shiftMapForPromo());
         }
 
         swapLabel(document.getElementById('step1Label'), 'Almost there', false);
@@ -1970,7 +2000,7 @@
       const promo = document.getElementById('foodPromo');
       if (promo) {
         promo.classList.add('visible');
-        requestAnimationFrame(() => positionSheetToClipRoute());
+        requestAnimationFrame(() => shiftMapForPromo());
       }
 
       schedule(() => {
