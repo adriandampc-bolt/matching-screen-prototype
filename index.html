@@ -620,6 +620,10 @@
     object-fit: contain;
   }
 
+  body.flow-progressive .action-btn-edit-pickup {
+    display: none;
+  }
+
   /* ── Divider ── */
   .divider {
     height: 8px;
@@ -1276,7 +1280,7 @@
   <button class="flow-btn flow-btn-3" id="flowBtn3" onclick="startFlow(3)">Simplified</button>
   <button class="flow-btn flow-btn-4" id="flowBtn4" onclick="startFlow(4)">Simplified, delayed promo</button>
   <button class="flow-btn flow-btn-5" id="flowBtn5" onclick="startFlow(5)">Simplified, promo</button>
-  <button class="flow-btn flow-btn-6" id="flowBtn6" onclick="startFlow(6)">Centered loader</button>
+  <button class="flow-btn flow-btn-6" id="flowBtn6" onclick="startFlow(6)">Progressive</button>
 </div>
 
 <div class="phone-container">
@@ -1416,7 +1420,7 @@
 
         <!-- Action Buttons -->
         <div class="action-buttons">
-          <button class="action-btn" onclick="handleEditPickup()">
+          <button class="action-btn action-btn-edit-pickup" onclick="handleEditPickup()">
             <img src="pin.png" alt="" aria-hidden="true" class="action-btn-icon">
             Edit pickup
           </button>
@@ -2120,6 +2124,8 @@
     Object.keys(FLOW_CONFIG).forEach(f => {
       document.getElementById('flowBtn' + f).classList.toggle('active', flow === +f);
     });
+
+    document.body.classList.toggle('flow-progressive', flow === 6);
 
     // Food promo: immediate
     if (config.foodPromo === 'immediate') {
