@@ -446,7 +446,6 @@
   .step-text {
     display: flex;
     flex-direction: column;
-    gap: 2px;
     min-width: 0;
   }
 
@@ -455,7 +454,19 @@
     line-height: 20px;
     letter-spacing: -0.084px;
     color: rgba(0, 17, 11, 0.47);
-    transition: opacity 0.25s ease;
+    max-height: 0;
+    opacity: 0;
+    margin-top: 0;
+    overflow: hidden;
+    transition: max-height 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                margin-top 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                opacity 0.25s ease;
+  }
+
+  .step-sublabel:not(:empty) {
+    max-height: 20px;
+    margin-top: 2px;
+    opacity: 1;
   }
 
   .step-sublabel.hidden {
@@ -622,6 +633,84 @@
 
   body.flow-progressive .action-btn-edit-pickup {
     display: none;
+  }
+
+  /* ── Prioritise Card (Progressive flow) ── */
+  .prioritise-card {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    margin: 0 8px;
+    transition: max-height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                opacity 0.3s ease,
+                margin-top 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                margin-bottom 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .prioritise-card-inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: #fff;
+    border: 1px solid rgba(0, 20, 13, 0.16);
+    border-radius: 16px;
+  }
+
+  .prioritise-card.visible {
+    max-height: 120px;
+    opacity: 1;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  .prioritise-text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .prioritise-secondary {
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: -0.084px;
+    color: rgba(0, 10, 7, 0.63);
+  }
+
+  .prioritise-primary {
+    font-size: 16px;
+    line-height: 20px;
+    font-weight: 600;
+    letter-spacing: -0.176px;
+    color: #191f1c;
+    margin-top: 2px;
+  }
+
+  .prioritise-btn {
+    background: #2b8659;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 8px 12px;
+    min-height: 36px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    letter-spacing: -0.084px;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: opacity 0.15s, transform 0.15s;
+  }
+
+  .prioritise-btn:hover {
+    opacity: 0.9;
+  }
+
+  .prioritise-btn:active {
+    transform: scale(0.97);
   }
 
   /* ── Divider ── */
@@ -1418,6 +1507,17 @@
           </div>
         </div>
 
+        <!-- Progressive flow: Prioritise offer card -->
+        <div class="prioritise-card" id="prioritiseCard">
+          <div class="prioritise-card-inner">
+            <div class="prioritise-text">
+              <span class="prioritise-secondary">Need a faster pickup?</span>
+              <span class="prioritise-primary">Try prioritising</span>
+            </div>
+            <button class="prioritise-btn" onclick="handlePrioritise()">Prioritise for 0.60€</button>
+          </div>
+        </div>
+
         <!-- Action Buttons -->
         <div class="action-buttons">
           <button class="action-btn action-btn-edit-pickup" onclick="handleEditPickup()">
@@ -2047,6 +2147,33 @@
     6: { singleStep: 'centered', foodPromo: false },
   };
 
+  function showPrioritiseCard() {
+    const card = document.getElementById('prioritiseCard');
+    if (!card) return;
+    const s = document.getElementById('bottomSheet');
+    const ref = s.querySelector('.route-divider') || s.querySelector('.divider') || s.querySelector('.section-gap');
+    if (!ref) return;
+
+    // Snapshot target sheet position by expanding the card instantly (no transition)
+    const originalTransition = card.style.transition;
+    card.style.transition = 'none';
+    card.classList.add('visible');
+    void card.offsetHeight;
+    const visibleHeight = ref.offsetTop + ROUTE_PEEK;
+    const sh = screenHeight();
+    const targetRatio = Math.max(0.3, Math.min((sh - visibleHeight) / sh, 0.85));
+
+    // Collapse back, then animate both card and sheet simultaneously
+    card.classList.remove('visible');
+    void card.offsetHeight;
+    card.style.transition = originalTransition;
+    void card.offsetHeight;
+
+    card.classList.add('visible');
+    SNAP_EXPANDED = targetRatio;
+    setSheetPosition(targetRatio);
+  }
+
   function runExtendedSearchFlow() {
     const label = () => document.getElementById('step1Label');
     const sub = () => document.getElementById('step1Sublabel');
@@ -2060,6 +2187,7 @@
     schedule(() => {
       swapLabel(sub(), 'Checking more drivers to find the match', false);
     }, 36000);
+    schedule(() => showPrioritiseCard(), 44000);
   }
 
   function runSingleStepFlow() {
@@ -2178,6 +2306,7 @@
   }
   function handleEditPickup() { console.log('Edit pickup tapped'); }
   function handleCancelRide() { console.log('Cancel ride tapped'); }
+  function handlePrioritise() { console.log('Prioritise tapped'); }
   function handleEditRoute() { console.log('Edit route tapped'); }
   function handleAddStop() { console.log('Add stop tapped'); }
 </script>
