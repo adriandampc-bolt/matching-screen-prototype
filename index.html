@@ -577,12 +577,21 @@
 
   /* ── Big Loader Variant ── */
   .progress-steps.centered {
+    padding-top: 0;
     padding-bottom: 12px;
   }
 
+  .progress-steps.centered .step {
+    align-items: flex-start;
+  }
+
   .progress-steps.centered .step-icon {
-    width: 48px;
-    height: 48px;
+    width: 42px;
+    height: 42px;
+  }
+
+  .progress-steps.centered .step-text {
+    padding-top: 0;
   }
 
   /* ── Action Buttons (Edit pickup, Cancel ride) ── */
@@ -635,12 +644,65 @@
     display: none;
   }
 
+  /* ── Cancel FAB (Progressive flow) ── */
+  .cancel-fab {
+    position: absolute;
+    top: 62px;
+    left: 72px;
+    display: none;
+    align-items: center;
+    gap: 8px;
+    height: 48px;
+    padding: 12px 16px 12px 12px;
+    background: #fff;
+    border: none;
+    border-radius: 100px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    z-index: 5;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 400;
+    color: #2f313f;
+    letter-spacing: -0.08px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .cancel-fab:hover {
+    transform: scale(1.03);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+  }
+
+  .cancel-fab:active {
+    transform: scale(0.97);
+  }
+
+  .cancel-fab svg,
+  .cancel-fab .cancel-fab-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    object-fit: contain;
+  }
+
+  .cancel-fab span {
+    line-height: 20px;
+  }
+
+  body.flow-progressive .cancel-fab {
+    display: inline-flex;
+  }
+
+  body.flow-progressive .action-buttons {
+    display: none;
+  }
+
   /* ── Prioritise Card (Progressive flow) ── */
   .prioritise-card {
     overflow: hidden;
     max-height: 0;
     opacity: 0;
-    margin: 0 8px;
+    margin: 0 24px;
     transition: max-height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
                 opacity 0.3s ease,
                 margin-top 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
@@ -649,8 +711,9 @@
 
   .prioritise-card-inner {
     display: flex;
-    align-items: center;
-    gap: 12px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
     padding: 12px 16px;
     background: #fff;
     border: 1px solid rgba(0, 20, 13, 0.16);
@@ -658,10 +721,10 @@
   }
 
   .prioritise-card.visible {
-    max-height: 120px;
+    max-height: 200px;
     opacity: 1;
-    margin-top: 0;
-    margin-bottom: 0;
+    margin-top: -8px;
+    margin-bottom: 8px;
   }
 
   .prioritise-text {
@@ -678,16 +741,36 @@
     color: rgba(0, 10, 7, 0.63);
   }
 
+  .prioritise-primary-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 0;
+  }
+
   .prioritise-primary {
     font-size: 16px;
     line-height: 20px;
     font-weight: 600;
     letter-spacing: -0.176px;
     color: #191f1c;
-    margin-top: 2px;
+  }
+
+  .prioritise-info {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(0, 10, 7, 0.63);
+  }
+
+  .prioritise-info svg {
+    width: 16px;
+    height: 16px;
+    display: block;
   }
 
   .prioritise-btn {
+    align-self: flex-start;
     background: #2b8659;
     color: #fff;
     border: none;
@@ -699,6 +782,7 @@
     line-height: 20px;
     letter-spacing: -0.084px;
     font-family: inherit;
+    text-align: center;
     cursor: pointer;
     white-space: nowrap;
     flex-shrink: 0;
@@ -1457,6 +1541,12 @@
         </svg>
       </button>
 
+      <!-- Cancel FAB (Progressive flow) -->
+      <button class="cancel-fab" id="cancelFab" onclick="handleCancelRide()">
+        <img src="cross.png" alt="" aria-hidden="true" class="cancel-fab-icon">
+        <span>Cancel</span>
+      </button>
+
       <!-- Bottom Sheet -->
       <div class="bottom-sheet" id="bottomSheet">
         <!-- Drag Handle -->
@@ -1512,9 +1602,18 @@
           <div class="prioritise-card-inner">
             <div class="prioritise-text">
               <span class="prioritise-secondary">Need a faster pickup?</span>
-              <span class="prioritise-primary">Try prioritising</span>
+              <span class="prioritise-primary-row">
+                <span class="prioritise-primary">Prioritise to get a ride sooner</span>
+                <span class="prioritise-info" aria-hidden="true">
+                  <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+                    <circle cx="8" cy="5" r="0.9" fill="currentColor"/>
+                    <path d="M8 7.5v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </span>
+              </span>
             </div>
-            <button class="prioritise-btn" onclick="handlePrioritise()">Prioritise for 0.60€</button>
+            <button class="prioritise-btn" onclick="handlePrioritise()">Prioritize for 0.60€</button>
           </div>
         </div>
 
@@ -2181,7 +2280,6 @@
     schedule(() => swapLabel(label(), 'Reviewing available options', false), 16000);
     schedule(() => swapLabel(label(), 'Extending the search', false), 24000);
     schedule(() => {
-      swapLabel(label(), 'Extending your search', false);
       swapLabel(sub(), 'Checking a wider area to find the right ride', false);
     }, 28000);
     schedule(() => {
