@@ -727,7 +727,7 @@
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 8px;
+    gap: 12px;
     padding: 12px 16px;
     background: #fff;
     border: 1px solid rgba(0, 20, 13, 0.16);
@@ -768,19 +768,6 @@
     font-weight: 600;
     letter-spacing: -0.176px;
     color: #191f1c;
-  }
-
-  .prioritise-info {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: rgba(0, 10, 7, 0.63);
-  }
-
-  .prioritise-info svg {
-    width: 16px;
-    height: 16px;
-    display: block;
   }
 
   .prioritise-btn {
@@ -1623,13 +1610,6 @@
               <span class="prioritise-secondary">Need a faster pickup?</span>
               <span class="prioritise-primary-row">
                 <span class="prioritise-primary">Prioritise to get a ride sooner</span>
-                <span class="prioritise-info" aria-hidden="true">
-                  <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
-                    <circle cx="8" cy="5" r="0.9" fill="currentColor"/>
-                    <path d="M8 7.5v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                  </svg>
-                </span>
               </span>
             </div>
             <button class="prioritise-btn" onclick="handlePrioritise()">Prioritize for 0.60€</button>
