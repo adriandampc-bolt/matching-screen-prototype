@@ -590,6 +590,20 @@
     height: 42px;
   }
 
+  .intercity-wrap {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .intercity-icon {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
   .progress-steps.centered .step-text {
     padding-top: 0;
   }
@@ -1432,6 +1446,10 @@
     background: #2F313F;
   }
 
+  .flow-btn-7 {
+    background: #2F313F;
+  }
+
   .flow-btn.active {
     background: #1D965C;
   }
@@ -1454,6 +1472,7 @@
   <button class="flow-btn flow-btn-4" id="flowBtn4" onclick="startFlow(4)">Simplified, delayed promo</button>
   <button class="flow-btn flow-btn-5" id="flowBtn5" onclick="startFlow(5)">Simplified, promo</button>
   <button class="flow-btn flow-btn-6" id="flowBtn6" onclick="startFlow(6)">Progressive</button>
+  <button class="flow-btn flow-btn-7" id="flowBtn7" onclick="startFlow(7)">Progressive - new animation</button>
 </div>
 
 <div class="phone-container">
@@ -1768,6 +1787,12 @@
     <circle class="arc" cx="11" cy="11" r="10" stroke="#006E37" stroke-opacity="0.83" stroke-width="2" stroke-linecap="round" stroke-dasharray="1 63" stroke-dashoffset="0" transform="rotate(-90 11 11)"/>
   </svg>`;
 
+  const INTERCITY_ICON_SVG = `<svg class="intercity-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path class="intercity-path" d="M17 4 H7 A4 4 0 0 0 7 12 H17 A4 4 0 0 1 17 20 H7" stroke="#006E37" stroke-opacity="0.83" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle class="intercity-start" cx="19" cy="4" r="2" stroke="#006E37" stroke-opacity="0.83" stroke-width="2" fill="none"/>
+    <circle class="intercity-end" cx="5" cy="20" r="2" stroke="#006E37" stroke-opacity="0.83" stroke-width="2" fill="none"/>
+  </svg>`;
+
   const UNFILLED_CIRCLE_SVG = `<svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path fill-rule="evenodd" clip-rule="evenodd" d="M11 0C14.0373 0 16.7888 1.23217 18.7783 3.22168C20.7678 5.21119 22 7.96271 22 11C22 14.0373 20.7678 16.7888 18.7783 18.7783C16.7888 20.7678 14.0373 22 11 22C7.96271 22 5.21119 20.7678 3.22168 18.7783C1.23217 16.7888 0 14.0373 0 11C0 7.96271 1.23217 5.21119 3.22168 3.22168C5.21119 1.23217 7.96271 0 11 0ZM11 2C8.51444 2 6.26552 3.00597 4.63574 4.63574C3.00597 6.26552 2 8.51444 2 11C2 13.4856 3.00597 15.7345 4.63574 17.3643C6.26552 18.994 8.51444 20 11 20C13.4856 20 15.7345 18.994 17.3643 17.3643C18.994 15.7345 20 13.4856 20 11C20 8.51444 18.994 6.26552 17.3643 4.63574C15.7345 3.00597 13.4856 2 11 2Z" fill="#00110B" fill-opacity="0.47"/>
   </svg>`;
@@ -1925,13 +1950,21 @@
     }, 250);
   }
 
-  function resetSteps(singleStep) {
+  function resetSteps(singleStep, variant) {
     const ps = document.getElementById('progressSteps');
     const isCentered = singleStep === 'centered';
+    const isIntercity = isCentered && variant === 'intercity';
     ps.classList.toggle('centered', isCentered);
+    ps.classList.toggle('intercity', isIntercity);
     if (singleStep) {
-      const spinnerClass = isCentered ? 'spinner snake' : 'spinner';
-      const spinnerSvg = isCentered ? SPINNER_SNAKE_SVG : SPINNER_SVG;
+      let iconHtml;
+      if (isIntercity) {
+        iconHtml = `<div class="intercity-wrap">${INTERCITY_ICON_SVG}</div>`;
+      } else if (isCentered) {
+        iconHtml = `<div class="spinner snake">${SPINNER_SNAKE_SVG}</div>`;
+      } else {
+        iconHtml = `<div class="spinner">${SPINNER_SVG}</div>`;
+      }
       const initialLabel = isCentered ? 'Checking nearby drivers' : 'Looking for the right driver...';
       const textBlock = isCentered
         ? `<div class="step-text">
@@ -1942,9 +1975,7 @@
       ps.innerHTML = `
         <div class="step" id="step1">
           <div class="step-icon" id="step1Icon">
-            <div class="${spinnerClass}">
-              ${spinnerSvg}
-            </div>
+            ${iconHtml}
           </div>
           ${textBlock}
         </div>
@@ -2243,7 +2274,8 @@
     3: { singleStep: true,  foodPromo: false },
     4: { singleStep: true,  foodPromo: 'delayed' },
     5: { singleStep: true,  foodPromo: 'immediate' },
-    6: { singleStep: 'centered', foodPromo: false },
+    6: { singleStep: 'centered', foodPromo: false, variant: 'spinner' },
+    7: { singleStep: 'centered', foodPromo: false, variant: 'intercity' },
   };
 
   function showPrioritiseCard() {
@@ -2342,7 +2374,7 @@
     document.getElementById('mapPulse').style.display = '';
     resetMapShift();
     sheet.innerHTML = originalSheetHTML;
-    resetSteps(config.singleStep);
+    resetSteps(config.singleStep, config.variant);
     startMatchingTimer();
     requestAnimationFrame(() => positionSheetToClipRoute());
 
@@ -2351,7 +2383,7 @@
       document.getElementById('flowBtn' + f).classList.toggle('active', flow === +f);
     });
 
-    document.body.classList.toggle('flow-progressive', flow === 6);
+    document.body.classList.toggle('flow-progressive', flow === 6 || flow === 7);
 
     // Food promo: immediate
     if (config.foodPromo === 'immediate') {
