@@ -1448,9 +1448,115 @@
     font-size: 11px;
     margin-top: 2px;
   }
+
+  /* ── Password Gate ── */
+  body.locked > *:not(.password-gate) {
+    visibility: hidden;
+  }
+
+  .password-gate {
+    position: fixed;
+    inset: 0;
+    background: #007042;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+
+  body:not(.locked) .password-gate {
+    display: none;
+  }
+
+  .password-gate-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 28px 24px;
+    width: 320px;
+    max-width: calc(100vw - 32px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .password-gate-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #191f1c;
+    letter-spacing: -0.198px;
+  }
+
+  .password-gate-sub {
+    font-size: 14px;
+    line-height: 20px;
+    color: rgba(0, 10, 7, 0.63);
+    letter-spacing: -0.084px;
+    margin-top: -8px;
+  }
+
+  .password-gate-input {
+    width: 100%;
+    height: 44px;
+    padding: 0 14px;
+    border: 1px solid rgba(0, 20, 13, 0.16);
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 16px;
+    color: #191f1c;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .password-gate-input:focus {
+    border-color: #2b8659;
+  }
+
+  .password-gate-input.error {
+    border-color: #d92c2c;
+  }
+
+  .password-gate-error {
+    font-size: 13px;
+    color: #d92c2c;
+    min-height: 16px;
+    margin-top: -8px;
+  }
+
+  .password-gate-btn {
+    height: 44px;
+    background: #2b8659;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.09px;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.15s;
+  }
+
+  .password-gate-btn:hover {
+    opacity: 0.92;
+  }
+
+  .password-gate-btn:active {
+    transform: scale(0.98);
+  }
 </style>
 </head>
-<body>
+<body class="locked">
+
+<div class="password-gate" id="passwordGate">
+  <form class="password-gate-card" onsubmit="return submitPassword(event)">
+    <div class="password-gate-title">Enter password</div>
+    <div class="password-gate-sub">This prototype is password-protected.</div>
+    <input type="password" class="password-gate-input" id="passwordInput" autocomplete="off" autofocus>
+    <div class="password-gate-error" id="passwordError"></div>
+    <button type="submit" class="password-gate-btn">Unlock</button>
+  </form>
+</div>
 
 <div class="flow-buttons">
   <button class="flow-btn flow-btn-1" id="flowBtn1" onclick="startFlow(1)">Full, quick</button>
@@ -1758,6 +1864,39 @@
 </div>
 
 <script>
+  // ── Password Gate ──
+  (function () {
+    const PASSWORD = 'bolt2026';
+    const STORAGE_KEY = 'prototype-unlocked';
+    if (localStorage.getItem(STORAGE_KEY) === '1') {
+      document.body.classList.remove('locked');
+    } else {
+      requestAnimationFrame(() => {
+        const input = document.getElementById('passwordInput');
+        if (input) input.focus();
+      });
+    }
+    window.submitPassword = function (event) {
+      event.preventDefault();
+      const input = document.getElementById('passwordInput');
+      const errorEl = document.getElementById('passwordError');
+      if (input.value === PASSWORD) {
+        localStorage.setItem(STORAGE_KEY, '1');
+        document.body.classList.remove('locked');
+      } else {
+        input.classList.add('error');
+        errorEl.textContent = 'Incorrect password';
+        input.select();
+        input.addEventListener('input', function clear() {
+          input.classList.remove('error');
+          errorEl.textContent = '';
+          input.removeEventListener('input', clear);
+        });
+      }
+      return false;
+    };
+  })();
+
   // ── SVG Templates ──
   const SPINNER_SVG = `<svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
     <circle class="arc" cx="11" cy="11" r="10" stroke="#006E37" stroke-opacity="0.83" stroke-width="2" stroke-linecap="round" stroke-dasharray="47.12 15.71" transform="rotate(-90 11 11)"/>
