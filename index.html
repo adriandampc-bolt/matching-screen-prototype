@@ -608,6 +608,62 @@
     padding-top: 0;
   }
 
+  /* ── Progressive 2 Variant (Flow 8) ── */
+  body.flow-progressive-2 .matching-header {
+    display: none;
+  }
+
+  .progress-steps.progressive-2 {
+    padding: 0 24px 16px;
+  }
+
+  .progress-steps.progressive-2 .step {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 0;
+  }
+
+  .progress-steps.progressive-2 .step-text {
+    flex: 1 1 0;
+    min-width: 0;
+    padding-top: 0;
+  }
+
+  .progress-steps.progressive-2 .step-title {
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 30px;
+    letter-spacing: -0.48px;
+    color: #2F313F;
+  }
+
+  .progress-steps.progressive-2 .step-label {
+    font-size: 16px;
+    line-height: 20px;
+    letter-spacing: -0.176px;
+    color: #191f1c;
+    margin-top: 4px;
+  }
+
+  .progress-steps.progressive-2 .step-sublabel {
+    font-size: 16px;
+    line-height: 20px;
+    letter-spacing: -0.176px;
+    color: rgba(0, 17, 11, 0.47);
+  }
+
+  .progress-steps.progressive-2 .step-sublabel:not(:empty) {
+    max-height: 20px;
+    margin-top: 4px;
+  }
+
+  .progress-steps.progressive-2 .step-icon {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+  }
+
   /* ── Action Buttons (Edit pickup, Cancel ride) ── */
   .action-buttons {
     display: flex;
@@ -1437,6 +1493,10 @@
     background: #2F313F;
   }
 
+  .flow-btn-8 {
+    background: #2F313F;
+  }
+
   .flow-btn.active {
     background: #1D965C;
   }
@@ -1566,6 +1626,7 @@
   <button class="flow-btn flow-btn-5" id="flowBtn5" onclick="startFlow(5)">Simplified, promo</button>
   <button class="flow-btn flow-btn-6" id="flowBtn6" onclick="startFlow(6)">Progressive</button>
   <button class="flow-btn flow-btn-7" id="flowBtn7" onclick="startFlow(7)">Progressive - new animation</button>
+  <button class="flow-btn flow-btn-8" id="flowBtn8" onclick="startFlow(8)">Progressive 2</button>
 </div>
 
 <div class="phone-container">
@@ -2073,8 +2134,10 @@
     const ps = document.getElementById('progressSteps');
     const isCentered = singleStep === 'centered';
     const isIntercity = isCentered && variant === 'intercity';
+    const isProgressive2 = isCentered && variant === 'progressive-2';
     ps.classList.toggle('centered', isCentered);
     ps.classList.toggle('intercity', isIntercity);
+    ps.classList.toggle('progressive-2', isProgressive2);
     if (singleStep) {
       let iconHtml;
       if (isIntercity) {
@@ -2085,20 +2148,35 @@
         iconHtml = `<div class="spinner">${SPINNER_SVG}</div>`;
       }
       const initialLabel = isCentered ? 'Checking nearby drivers' : 'Looking for the right driver...';
-      const textBlock = isCentered
-        ? `<div class="step-text">
-            <span class="step-label" id="step1Label">${initialLabel}</span>
-            <span class="step-sublabel" id="step1Sublabel"></span>
-          </div>`
-        : `<span class="step-label" id="step1Label">${initialLabel}</span>`;
-      ps.innerHTML = `
-        <div class="step" id="step1">
-          <div class="step-icon" id="step1Icon">
-            ${iconHtml}
+      if (isProgressive2) {
+        ps.innerHTML = `
+          <div class="step" id="step1">
+            <div class="step-text">
+              <span class="step-title">Setting up your ride</span>
+              <span class="step-label" id="step1Label">${initialLabel}</span>
+              <span class="step-sublabel" id="step1Sublabel"></span>
+            </div>
+            <div class="step-icon" id="step1Icon">
+              ${iconHtml}
+            </div>
           </div>
-          ${textBlock}
-        </div>
-      `;
+        `;
+      } else {
+        const textBlock = isCentered
+          ? `<div class="step-text">
+              <span class="step-label" id="step1Label">${initialLabel}</span>
+              <span class="step-sublabel" id="step1Sublabel"></span>
+            </div>`
+          : `<span class="step-label" id="step1Label">${initialLabel}</span>`;
+        ps.innerHTML = `
+          <div class="step" id="step1">
+            <div class="step-icon" id="step1Icon">
+              ${iconHtml}
+            </div>
+            ${textBlock}
+          </div>
+        `;
+      }
     } else {
       ps.innerHTML = `
         <div class="step" id="step1">
@@ -2395,6 +2473,7 @@
     5: { singleStep: true,  foodPromo: 'immediate' },
     6: { singleStep: 'centered', foodPromo: false, variant: 'spinner' },
     7: { singleStep: 'centered', foodPromo: false, variant: 'intercity' },
+    8: { singleStep: 'centered', foodPromo: false, variant: 'progressive-2' },
   };
 
   function showPrioritiseCard() {
@@ -2502,7 +2581,8 @@
       document.getElementById('flowBtn' + f).classList.toggle('active', flow === +f);
     });
 
-    document.body.classList.toggle('flow-progressive', flow === 6 || flow === 7);
+    document.body.classList.toggle('flow-progressive', flow === 6 || flow === 7 || flow === 8);
+    document.body.classList.toggle('flow-progressive-2', flow === 8);
 
     // Food promo: immediate
     if (config.foodPromo === 'immediate') {
