@@ -604,6 +604,15 @@
     overflow: visible;
   }
 
+  @keyframes intercity-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .intercity-path {
+    animation: intercity-pulse 1.1s ease-in-out infinite;
+  }
+
   .progress-steps.centered .step-text {
     padding-top: 0;
   }
@@ -1969,10 +1978,10 @@
     <circle class="arc" cx="11" cy="11" r="10" stroke="#006E37" stroke-opacity="0.83" stroke-width="2" stroke-linecap="round" stroke-dasharray="1 63" stroke-dashoffset="0" transform="rotate(-90 11 11)"/>
   </svg>`;
 
-  const INTERCITY_ICON_SVG = `<svg class="intercity-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path class="intercity-path" d="M17 4 H7 A4 4 0 0 0 7 12 H17 A4 4 0 0 1 17 20 H7" stroke="#006E37" stroke-opacity="0.83" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    <circle class="intercity-start" cx="19" cy="4" r="2" stroke="#006E37" stroke-opacity="0.83" stroke-width="2" fill="none"/>
-    <circle class="intercity-end" cx="5" cy="20" r="2" stroke="#006E37" stroke-opacity="0.83" stroke-width="2" fill="none"/>
+  const INTERCITY_ICON_SVG = `<svg class="intercity-icon" viewBox="0 0 27 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path class="intercity-path" fill-rule="evenodd" clip-rule="evenodd" d="M18.467 0C18.467 0 18.467 0.772727 18.467 1.27273C18.467 1.77273 18.467 1.72343 18.467 2.72727H5.39736C3.91026 2.72737 2.69868 3.95051 2.69868 5.45455C2.69868 6.65452 3.46221 7.70201 4.59712 8.0593L23.1253 13.8814C25.3965 14.5947 26.9209 16.6883 26.9209 19.0909C26.9209 22.0989 24.5004 24.5452 21.5235 24.5455H8.4668C8.4668 23.7727 8.4668 23.7727 8.4668 23.7727C8.4668 23.7727 8.4668 23.7727 8.4668 23.2727C8.4668 22.8189 8.4668 22.7727 8.4668 22.7727C8.4668 22.7727 8.4668 22.8868 8.4668 21.7727L21.5235 21.8182C23.0105 21.8179 24.2222 20.5948 24.2222 19.0909C24.2222 17.8897 23.4585 16.8435 22.3238 16.4862L3.79556 10.6641C1.5243 9.94952 0 7.85591 0 5.45455C0 2.44506 2.42038 9.33991e-05 5.39736 0H18.467Z" fill="#007042"/>
+    <circle class="intercity-start" cx="21" cy="1" r="2.5" stroke="#007042" stroke-width="2" fill="none"/>
+    <circle class="intercity-end" cx="6" cy="23" r="2.5" stroke="#007042" stroke-width="2" fill="none"/>
   </svg>`;
 
   const UNFILLED_CIRCLE_SVG = `<svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
