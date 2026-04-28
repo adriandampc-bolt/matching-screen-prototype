@@ -675,6 +675,81 @@
     flex-shrink: 0;
   }
 
+  /* ── Progressive 3 Variant (Flow 9) ── */
+  body.flow-progressive-3 .matching-header {
+    display: none;
+  }
+
+  .progress-steps.progressive-3 {
+    padding: 0 24px 16px;
+  }
+
+  .progress-steps.progressive-3 .step {
+    padding: 0;
+  }
+
+  .progress-steps.progressive-3 .step-text {
+    width: 100%;
+    padding-top: 0;
+    gap: 12px;
+  }
+
+  .progress-steps.progressive-3 .step-title {
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 30px;
+    letter-spacing: -0.48px;
+    color: #2F313F;
+  }
+
+  .progress-steps.progressive-3 .step-label {
+    font-size: 16px;
+    line-height: 20px;
+    letter-spacing: -0.176px;
+    color: #191f1c;
+  }
+
+  .progress-steps.progressive-3 .step-sublabel {
+    font-size: 16px;
+    line-height: 20px;
+    letter-spacing: -0.176px;
+    color: rgba(0, 17, 11, 0.47);
+    white-space: nowrap;
+    overflow: visible;
+  }
+
+  .progress-steps.progressive-3 .step-sublabel:not(:empty) {
+    max-height: 20px;
+    margin-top: 0;
+  }
+
+  /* Progress bar */
+  .p3-progress-bar {
+    position: relative;
+    height: 4px;
+    background: rgba(0, 45, 30, 0.07);
+    border-radius: 4px;
+    width: 100%;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .p3-progress-bar-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 80px;
+    background: rgba(0, 110, 55, 0.83);
+    border-radius: 4px;
+    animation: p3-shuttle 1s ease-in-out infinite alternate;
+  }
+
+  @keyframes p3-shuttle {
+    0%   { left: 0; }
+    100% { left: calc(100% - 80px); }
+  }
+
   /* ── Action Buttons (Edit pickup, Cancel ride) ── */
   .action-buttons {
     display: flex;
@@ -1508,6 +1583,10 @@
     background: #2F313F;
   }
 
+  .flow-btn-9 {
+    background: #2F313F;
+  }
+
   .flow-btn.active {
     background: #1D965C;
   }
@@ -1638,6 +1717,7 @@
   <button class="flow-btn flow-btn-6" id="flowBtn6" onclick="startFlow(6)">Progressive</button>
   <button class="flow-btn flow-btn-7" id="flowBtn7" onclick="startFlow(7)">Progressive - new animation</button>
   <button class="flow-btn flow-btn-8" id="flowBtn8" onclick="startFlow(8)">Progressive 2</button>
+  <button class="flow-btn flow-btn-9" id="flowBtn9" onclick="startFlow(9)">Progressive 3</button>
 </div>
 
 <div class="phone-container">
@@ -2146,9 +2226,11 @@
     const isCentered = singleStep === 'centered';
     const isIntercity = isCentered && variant === 'intercity';
     const isProgressive2 = isCentered && variant === 'progressive-2';
+    const isProgressive3 = isCentered && variant === 'progressive-3';
     ps.classList.toggle('centered', isCentered);
     ps.classList.toggle('intercity', isIntercity);
     ps.classList.toggle('progressive-2', isProgressive2);
+    ps.classList.toggle('progressive-3', isProgressive3);
     if (singleStep) {
       let iconHtml;
       if (isIntercity) {
@@ -2169,6 +2251,17 @@
             </div>
             <div class="step-icon" id="step1Icon">
               ${iconHtml}
+            </div>
+          </div>
+        `;
+      } else if (isProgressive3) {
+        ps.innerHTML = `
+          <div class="step" id="step1">
+            <div class="step-text">
+              <span class="step-title">Setting up your ride</span>
+              <div class="p3-progress-bar"><div class="p3-progress-bar-fill"></div></div>
+              <span class="step-label" id="step1Label">${initialLabel}</span>
+              <span class="step-sublabel" id="step1Sublabel"></span>
             </div>
           </div>
         `;
@@ -2485,6 +2578,7 @@
     6: { singleStep: 'centered', foodPromo: false, variant: 'spinner' },
     7: { singleStep: 'centered', foodPromo: false, variant: 'intercity' },
     8: { singleStep: 'centered', foodPromo: false, variant: 'progressive-2' },
+    9: { singleStep: 'centered', foodPromo: false, variant: 'progressive-3' },
   };
 
   function showPrioritiseCard() {
@@ -2592,8 +2686,9 @@
       document.getElementById('flowBtn' + f).classList.toggle('active', flow === +f);
     });
 
-    document.body.classList.toggle('flow-progressive', flow === 6 || flow === 7 || flow === 8);
+    document.body.classList.toggle('flow-progressive', flow === 6 || flow === 7 || flow === 8 || flow === 9);
     document.body.classList.toggle('flow-progressive-2', flow === 8);
+    document.body.classList.toggle('flow-progressive-3', flow === 9);
 
     // Food promo: immediate
     if (config.foodPromo === 'immediate') {
