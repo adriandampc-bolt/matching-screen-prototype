@@ -750,6 +750,54 @@
     100% { left: calc(100% - 80px); }
   }
 
+  /* ── Progressive Main Variant (Flow 10) ── */
+  body.flow-progressive-main .matching-header {
+    display: none;
+  }
+
+  .progress-steps.progressive-main {
+    padding: 0 24px 16px;
+  }
+
+  .progress-steps.progressive-main .step {
+    padding: 0;
+  }
+
+  .progress-steps.progressive-main .step-text {
+    width: 100%;
+    padding-top: 0;
+    gap: 12px;
+  }
+
+  .progress-steps.progressive-main .step-title {
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 30px;
+    letter-spacing: -0.48px;
+    color: #2F313F;
+  }
+
+  .progress-steps.progressive-main .step-label {
+    font-size: 16px;
+    line-height: 20px;
+    letter-spacing: -0.176px;
+    color: #191f1c;
+  }
+
+  .progress-steps.progressive-main .step-sublabel {
+    font-size: 16px;
+    line-height: 20px;
+    letter-spacing: -0.176px;
+    color: rgba(0, 17, 11, 0.47);
+    white-space: nowrap;
+    overflow: visible;
+  }
+
+  .progress-steps.progressive-main .step-sublabel:not(:empty) {
+    max-height: 20px;
+    margin-top: 0;
+  }
+
   /* ── Action Buttons (Edit pickup, Cancel ride) ── */
   .action-buttons {
     display: flex;
@@ -1587,6 +1635,10 @@
     background: #2F313F;
   }
 
+  .flow-btn-10 {
+    background: #2F313F;
+  }
+
   .flow-btn.active {
     background: #1D965C;
   }
@@ -1718,6 +1770,7 @@
   <button class="flow-btn flow-btn-7" id="flowBtn7" onclick="startFlow(7)">Progressive - new animation</button>
   <button class="flow-btn flow-btn-8" id="flowBtn8" onclick="startFlow(8)">Progressive 2</button>
   <button class="flow-btn flow-btn-9" id="flowBtn9" onclick="startFlow(9)">Progressive 3</button>
+  <button class="flow-btn flow-btn-10" id="flowBtn10" onclick="startFlow(10)">Progressive Main</button>
 </div>
 
 <div class="phone-container">
@@ -2227,10 +2280,12 @@
     const isIntercity = isCentered && variant === 'intercity';
     const isProgressive2 = isCentered && variant === 'progressive-2';
     const isProgressive3 = isCentered && variant === 'progressive-3';
+    const isProgressiveMain = isCentered && variant === 'progressive-main';
     ps.classList.toggle('centered', isCentered);
     ps.classList.toggle('intercity', isIntercity);
     ps.classList.toggle('progressive-2', isProgressive2);
     ps.classList.toggle('progressive-3', isProgressive3);
+    ps.classList.toggle('progressive-main', isProgressiveMain);
     if (singleStep) {
       let iconHtml;
       if (isIntercity) {
@@ -2254,7 +2309,7 @@
             </div>
           </div>
         `;
-      } else if (isProgressive3) {
+      } else if (isProgressive3 || isProgressiveMain) {
         ps.innerHTML = `
           <div class="step" id="step1">
             <div class="step-text">
@@ -2579,6 +2634,7 @@
     7: { singleStep: 'centered', foodPromo: false, variant: 'intercity' },
     8: { singleStep: 'centered', foodPromo: false, variant: 'progressive-2' },
     9: { singleStep: 'centered', foodPromo: false, variant: 'progressive-3' },
+    10: { singleStep: 'centered', foodPromo: false, variant: 'progressive-main' },
   };
 
   function showPrioritiseCard() {
@@ -2686,9 +2742,10 @@
       document.getElementById('flowBtn' + f).classList.toggle('active', flow === +f);
     });
 
-    document.body.classList.toggle('flow-progressive', flow === 6 || flow === 7 || flow === 8 || flow === 9);
+    document.body.classList.toggle('flow-progressive', flow === 6 || flow === 7 || flow === 8 || flow === 9 || flow === 10);
     document.body.classList.toggle('flow-progressive-2', flow === 8);
     document.body.classList.toggle('flow-progressive-3', flow === 9);
+    document.body.classList.toggle('flow-progressive-main', flow === 10);
 
     // Food promo: immediate
     if (config.foodPromo === 'immediate') {
