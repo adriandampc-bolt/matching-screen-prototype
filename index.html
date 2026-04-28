@@ -443,6 +443,14 @@
     opacity: 0;
   }
 
+  .step-title {
+    transition: opacity 0.25s ease;
+  }
+
+  .step-title.hidden {
+    opacity: 0;
+  }
+
   .step-text {
     display: flex;
     flex-direction: column;
@@ -718,9 +726,8 @@
     overflow: visible;
   }
 
-  .progress-steps.progressive-3 .step-sublabel:not(:empty) {
-    max-height: 20px;
-    margin-top: 0;
+  .progress-steps.progressive-3 .step-sublabel {
+    display: none;
   }
 
   /* Progress bar */
@@ -2262,6 +2269,9 @@
   }
 
   function swapLabel(el, text, removePending) {
+    if (el && el.id === 'step1Sublabel' && document.body.classList.contains('flow-progressive-3')) {
+      el = document.getElementById('step1Label');
+    }
     el.classList.add('hidden');
     schedule(() => {
       el.textContent = text;
@@ -2309,7 +2319,17 @@
             </div>
           </div>
         `;
-      } else if (isProgressive3 || isProgressiveMain) {
+      } else if (isProgressive3) {
+        ps.innerHTML = `
+          <div class="step" id="step1">
+            <div class="step-text">
+              <span class="step-title">Setting up your ride</span>
+              <span class="step-label" id="step1Label">${initialLabel}</span>
+              <span class="step-sublabel" id="step1Sublabel"></span>
+            </div>
+          </div>
+        `;
+      } else if (isProgressiveMain) {
         ps.innerHTML = `
           <div class="step" id="step1">
             <div class="step-text">
@@ -2664,6 +2684,20 @@
     setSheetPosition(targetRatio);
   }
 
+  function startP3TitleDots() {
+    const dots = ['', '.', '..', '...'];
+    let i = 0;
+    function tick() {
+      const title = document.querySelector('#progressSteps .step-title');
+      if (!title) return;
+      const base = title.textContent.replace(/\.{1,3}$/, '');
+      title.textContent = base + dots[i];
+      i = (i + 1) % 4;
+      schedule(tick, 500);
+    }
+    schedule(tick, 500);
+  }
+
   function runExtendedSearchFlow() {
     const label = () => document.getElementById('step1Label');
     const sub = () => document.getElementById('step1Sublabel');
@@ -2756,6 +2790,13 @@
     if (config.singleStep) {
       if (config.singleStep === 'centered') {
         runExtendedSearchFlow();
+        if (flow === 9) {
+          startP3TitleDots();
+          schedule(() => {
+            const title = document.querySelector('#progressSteps .step-title');
+            if (title) swapLabel(title, 'Expanding your search', false);
+          }, 28000);
+        }
         return;
       }
       if (config.foodPromo === 'delayed') {
