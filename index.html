@@ -704,6 +704,15 @@
     display: block;
   }
 
+  @keyframes car-pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50%       { transform: scale(0.93); opacity: 0.75; }
+  }
+
+  body.flow-progressive-car .car-slot img {
+    animation: car-pulse 1.6s ease-in-out infinite;
+  }
+
   body.flow-progressive-car .matching-header {
     display: none;
   }
@@ -2870,7 +2879,7 @@
       if (config.singleStep === 'centered') {
         runExtendedSearchFlow();
         if (flow === 9 || flow === 11) {
-          startP3TitleDots();
+          if (flow === 9) startP3TitleDots();
           schedule(() => {
             const title = document.querySelector('#progressSteps .step-title');
             if (title) swapLabel(title, 'Expanding your search', false);
