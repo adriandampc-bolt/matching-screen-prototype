@@ -683,6 +683,31 @@
     flex-shrink: 0;
   }
 
+  /* ── Car slot ── */
+  .car-slot {
+    display: none;
+    width: 200px;
+    height: 120px;
+    overflow: hidden;
+    margin: 0 auto;
+  }
+
+  .car-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    display: block;
+  }
+
+  body.flow-progressive-car .car-slot {
+    display: block;
+  }
+
+  body.flow-progressive-car .matching-header {
+    display: none;
+  }
+
   /* ── Progressive 3 Variant (Flow 9) ── */
   body.flow-progressive-3 .matching-header {
     display: none;
@@ -1821,6 +1846,7 @@
       <button class="flow-btn flow-btn-7" id="flowBtn7" onclick="startFlow(7)">Progressive - new animation</button>
       <button class="flow-btn flow-btn-8" id="flowBtn8" onclick="startFlow(8)">Progressive 2</button>
       <button class="flow-btn flow-btn-10" id="flowBtn10" onclick="startFlow(10)">Progressive Main</button>
+      <button class="flow-btn flow-btn-9" id="flowBtn11" onclick="startFlow(11)">Main Flow + Car</button>
     </div>
   </div>
 </div>
@@ -1921,6 +1947,11 @@
         <!-- Drag Handle -->
         <div class="sheet-indicator" id="sheetHandle">
           <div class="sheet-indicator-bar"></div>
+        </div>
+
+        <!-- Car image (progressive-car flow) -->
+        <div class="car-slot">
+          <img src="car.png" alt="">
         </div>
 
         <!-- Dropoff & Timer -->
@@ -2314,7 +2345,7 @@
   }
 
   function swapLabel(el, text, removePending) {
-    if (el && el.id === 'step1Sublabel' && document.body.classList.contains('flow-progressive-3')) {
+    if (el && el.id === 'step1Sublabel' && (document.body.classList.contains('flow-progressive-3') || document.body.classList.contains('flow-progressive-car'))) {
       el = document.getElementById('step1Label');
     }
     el.classList.add('hidden');
@@ -2335,11 +2366,12 @@
     const isIntercity = isCentered && variant === 'intercity';
     const isProgressive2 = isCentered && variant === 'progressive-2';
     const isProgressive3 = isCentered && variant === 'progressive-3';
+    const isProgressiveCar = isCentered && variant === 'progressive-car';
     const isProgressiveMain = isCentered && variant === 'progressive-main';
     ps.classList.toggle('centered', isCentered);
     ps.classList.toggle('intercity', isIntercity);
     ps.classList.toggle('progressive-2', isProgressive2);
-    ps.classList.toggle('progressive-3', isProgressive3);
+    ps.classList.toggle('progressive-3', isProgressive3 || isProgressiveCar);
     ps.classList.toggle('progressive-main', isProgressiveMain);
     if (singleStep) {
       let iconHtml;
@@ -2364,7 +2396,7 @@
             </div>
           </div>
         `;
-      } else if (isProgressive3) {
+      } else if (isProgressive3 || isProgressiveCar) {
         ps.innerHTML = `
           <div class="step" id="step1">
             <div class="step-text">
@@ -2700,6 +2732,7 @@
     8: { singleStep: 'centered', foodPromo: false, variant: 'progressive-2' },
     9: { singleStep: 'centered', foodPromo: false, variant: 'progressive-3' },
     10: { singleStep: 'centered', foodPromo: false, variant: 'progressive-main' },
+    11: { singleStep: 'centered', foodPromo: false, variant: 'progressive-car' },
   };
 
   function showPrioritiseCard() {
@@ -2821,10 +2854,11 @@
       document.getElementById('flowBtn' + f).classList.toggle('active', flow === +f);
     });
 
-    document.body.classList.toggle('flow-progressive', flow === 6 || flow === 7 || flow === 8 || flow === 9 || flow === 10);
+    document.body.classList.toggle('flow-progressive', flow === 6 || flow === 7 || flow === 8 || flow === 9 || flow === 10 || flow === 11);
     document.body.classList.toggle('flow-progressive-2', flow === 8);
     document.body.classList.toggle('flow-progressive-3', flow === 9);
     document.body.classList.toggle('flow-progressive-main', flow === 10);
+    document.body.classList.toggle('flow-progressive-car', flow === 11);
 
     // Food promo: immediate
     if (config.foodPromo === 'immediate') {
@@ -2835,7 +2869,7 @@
     if (config.singleStep) {
       if (config.singleStep === 'centered') {
         runExtendedSearchFlow();
-        if (flow === 9) {
+        if (flow === 9 || flow === 11) {
           startP3TitleDots();
           schedule(() => {
             const title = document.querySelector('#progressSteps .step-title');
