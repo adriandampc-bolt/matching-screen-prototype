@@ -1435,6 +1435,46 @@
     z-index: 100;
   }
 
+  .flow-backup {
+    position: relative;
+  }
+
+  .flow-backup-toggle {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    color: rgba(255,255,255,0.7);
+    background: #2F313F;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    width: 100%;
+    text-align: left;
+    transition: opacity 0.15s;
+  }
+
+  .flow-backup-toggle:hover { opacity: 0.85; }
+
+  .flow-backup-menu {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: rgba(20,22,30,0.97);
+    border-radius: 12px;
+    padding: 10px;
+    min-width: 220px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+  }
+
+  .flow-backup-menu.open {
+    display: flex;
+  }
+
   /* ── Food Promo (Bolt Food cross-sell) ── */
   .food-promo {
     display: none;
@@ -1768,16 +1808,21 @@
 </div>
 
 <div class="flow-buttons">
-  <button class="flow-btn flow-btn-1" id="flowBtn1" onclick="startFlow(1)">Full, quick</button>
-  <button class="flow-btn flow-btn-2" id="flowBtn2" onclick="startFlow(2)">Full, long</button>
-  <button class="flow-btn flow-btn-3" id="flowBtn3" onclick="startFlow(3)">Simplified</button>
-  <button class="flow-btn flow-btn-4" id="flowBtn4" onclick="startFlow(4)">Simplified, delayed promo</button>
-  <button class="flow-btn flow-btn-5" id="flowBtn5" onclick="startFlow(5)">Simplified, promo</button>
-  <button class="flow-btn flow-btn-6" id="flowBtn6" onclick="startFlow(6)">Progressive</button>
-  <button class="flow-btn flow-btn-7" id="flowBtn7" onclick="startFlow(7)">Progressive - new animation</button>
-  <button class="flow-btn flow-btn-8" id="flowBtn8" onclick="startFlow(8)">Progressive 2</button>
   <button class="flow-btn flow-btn-9" id="flowBtn9" onclick="startFlow(9)">Progressive 3</button>
-  <button class="flow-btn flow-btn-10" id="flowBtn10" onclick="startFlow(10)">Progressive Main</button>
+  <div class="flow-backup">
+    <button class="flow-backup-toggle" onclick="toggleBackupDropdown()">Backup ▾</button>
+    <div class="flow-backup-menu" id="backupMenu">
+      <button class="flow-btn flow-btn-1" id="flowBtn1" onclick="startFlow(1)">Full, quick</button>
+      <button class="flow-btn flow-btn-2" id="flowBtn2" onclick="startFlow(2)">Full, long</button>
+      <button class="flow-btn flow-btn-3" id="flowBtn3" onclick="startFlow(3)">Simplified</button>
+      <button class="flow-btn flow-btn-4" id="flowBtn4" onclick="startFlow(4)">Simplified, delayed promo</button>
+      <button class="flow-btn flow-btn-5" id="flowBtn5" onclick="startFlow(5)">Simplified, promo</button>
+      <button class="flow-btn flow-btn-6" id="flowBtn6" onclick="startFlow(6)">Progressive</button>
+      <button class="flow-btn flow-btn-7" id="flowBtn7" onclick="startFlow(7)">Progressive - new animation</button>
+      <button class="flow-btn flow-btn-8" id="flowBtn8" onclick="startFlow(8)">Progressive 2</button>
+      <button class="flow-btn flow-btn-10" id="flowBtn10" onclick="startFlow(10)">Progressive Main</button>
+    </div>
+  </div>
 </div>
 
 <div class="phone-container">
@@ -2832,6 +2877,17 @@
   startFlow(1);
 
   // ── Interactive handlers ──
+  function toggleBackupDropdown() {
+    document.getElementById('backupMenu').classList.toggle('open');
+  }
+
+  document.addEventListener('click', (e) => {
+    const backup = document.querySelector('.flow-backup');
+    if (backup && !backup.contains(e.target)) {
+      document.getElementById('backupMenu').classList.remove('open');
+    }
+  });
+
   function handleClose() {
     const btn = document.querySelector('.close-btn');
     btn.style.opacity = '0.5';
