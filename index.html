@@ -990,6 +990,39 @@
     display: inline-flex;
   }
 
+  /* ── Cancel Button (panel "Button" option) ── */
+  .cancel-ride-sheet {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 16px 0 12px;
+    background: rgba(0,20,13,0.07);
+    border: none;
+    border-radius: 100px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: #191f1c;
+    letter-spacing: -0.084px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .cancel-ride-sheet:hover { background: rgba(0,20,13,0.11); }
+  .cancel-ride-sheet:active { background: rgba(0,20,13,0.15); }
+
+  .cancel-ride-sheet img {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+
+  body.cancel-button .cancel-ride-sheet {
+    display: inline-flex;
+  }
+
   body.flow-progressive .action-buttons {
     display: none;
   }
@@ -2261,6 +2294,7 @@
         <span>Cancel</span>
       </button>
 
+
       <!-- Bottom Sheet -->
       <div class="bottom-sheet" id="bottomSheet">
         <!-- Drag Handle -->
@@ -2338,6 +2372,14 @@
           <button class="action-btn" onclick="handleCancelRide()">
             <img src="cancel-ride.png" alt="" aria-hidden="true" class="action-btn-icon">
             Cancel ride
+          </button>
+        </div>
+
+        <!-- Cancel Button (panel "Button" option) -->
+        <div style="padding: 8px 24px 16px;">
+          <button class="cancel-ride-sheet" onclick="handleCancelRide()">
+            <img src="cancel-ride.png" alt="" aria-hidden="true">
+            <span>Cancel ride</span>
           </button>
         </div>
 
@@ -3251,6 +3293,7 @@
     document.body.classList.toggle('flow-progressive-main', flow === 10);
     document.body.classList.toggle('flow-progressive-car', flow === 11);
     document.body.classList.toggle('loader-car', isMain && activePanel.loader === 'Car');
+    document.body.classList.toggle('cancel-button',  isMain && activePanel.cancel === 'Button');
     document.body.classList.toggle('cancel-top-btn', isMain && activePanel.cancel === 'Top button');
     document.body.classList.toggle('cancel-x-icon',  isMain && activePanel.cancel === '"X" icon');
 
