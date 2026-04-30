@@ -1019,6 +1019,15 @@
     flex-shrink: 0;
   }
 
+  .cancel-ride-sheet-wrap {
+    display: none;
+    padding: 8px 24px 16px;
+  }
+
+  body.cancel-button .cancel-ride-sheet-wrap {
+    display: block;
+  }
+
   body.cancel-button .cancel-ride-sheet {
     display: inline-flex;
   }
@@ -2376,7 +2385,7 @@
         </div>
 
         <!-- Cancel Button (panel "Button" option) -->
-        <div style="padding: 8px 24px 16px;">
+        <div class="cancel-ride-sheet-wrap">
           <button class="cancel-ride-sheet" onclick="handleCancelRide()">
             <img src="cancel-ride.png" alt="" aria-hidden="true">
             <span>Cancel ride</span>
@@ -3463,8 +3472,13 @@
 
   function fcpRestoreDefaults() {
     try {
-      const saved = JSON.parse(localStorage.getItem('fcpDefaults'));
-      if (!saved) return;
+      let saved = JSON.parse(localStorage.getItem('fcpDefaults'));
+      if (!saved) {
+        // First run: persist the HTML defaults silently
+        saved = readPanelConfig();
+        localStorage.setItem('fcpDefaults', JSON.stringify(saved));
+        return;
+      }
       const mtEl = document.getElementById('fcpMatchingTime');
       const utEl = document.getElementById('fcpUpsellTiming');
       const etaEl = document.getElementById('fcpDropoffEta');
