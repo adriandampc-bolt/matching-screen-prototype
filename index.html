@@ -756,6 +756,16 @@
     animation: car-pulse 1.6s ease-in-out infinite;
   }
 
+  /* ── Copy Pulse loader ── */
+  @keyframes copy-pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.3; }
+  }
+
+  body.loader-copy-pulse #progressSteps .step-title {
+    animation: copy-pulse 1.6s ease-in-out infinite;
+  }
+
   body.flow-progressive-car .matching-header {
     display: none;
   }
@@ -2662,7 +2672,8 @@
   let flowPaused = false;
 
   // ── Flow Engine ──
-  let flowTimers = [];
+  let flowTimers  = [];   // { id, fn, scheduledAt, delay }
+  let pausedTimers = [];  // { fn, remainingMs } — saved on pause
 
   let matchingTimerInterval = null;
   let matchingSeconds = 0;
@@ -2694,8 +2705,32 @@
   }
 
   function clearFlow() {
-    flowTimers.forEach(id => clearTimeout(id));
+    flowTimers.forEach(t => clearTimeout(t.id));
+    flowTimers  = [];
+    pausedTimers = [];
+  }
+
+  function pauseFlow() {
+    const now = Date.now();
+    pausedTimers = flowTimers.map(t => ({
+      fn:          t.fn,
+      remainingMs: Math.max(0, t.delay - (now - t.scheduledAt)),
+    }));
+    flowTimers.forEach(t => clearTimeout(t.id));
     flowTimers = [];
+  }
+
+  function resumeFlow() {
+    pausedTimers.forEach(({ fn, remainingMs }) => schedule(fn, remainingMs));
+    pausedTimers = [];
+  }
+
+  function resumeMatchingTimer() {
+    if (matchingTimerInterval) return;
+    matchingTimerInterval = setInterval(() => {
+      matchingSeconds++;
+      updateMatchingTimerDisplay();
+    }, 1000);
   }
 
   function shiftMapForPromo() {
@@ -2715,9 +2750,13 @@
   }
 
   function schedule(fn, delay) {
-    const id = setTimeout(fn, delay);
-    flowTimers.push(id);
-    return id;
+    const entry = { fn, scheduledAt: Date.now(), delay };
+    entry.id = setTimeout(() => {
+      flowTimers = flowTimers.filter(t => t !== entry);
+      fn();
+    }, delay);
+    flowTimers.push(entry);
+    return entry.id;
   }
 
   function swapLabel(el, text, removePending) {
@@ -3302,7 +3341,8 @@
     document.body.classList.toggle('flow-progressive-3', flow === 9 && !(isMain && activePanel.loader === 'Spinner'));
     document.body.classList.toggle('flow-progressive-main', flow === 10);
     document.body.classList.toggle('flow-progressive-car', flow === 11);
-    document.body.classList.toggle('loader-car', isMain && activePanel.loader === 'Car');
+    document.body.classList.toggle('loader-car',        isMain && activePanel.loader === 'Car');
+    document.body.classList.toggle('loader-copy-pulse', isMain && activePanel.loader === 'Copy pulse');
     document.body.classList.toggle('cancel-button',  isMain && activePanel.cancel === 'Button');
     document.body.classList.toggle('cancel-top-btn', isMain && activePanel.cancel === 'Top button');
     document.body.classList.toggle('cancel-x-icon',  isMain && activePanel.cancel === '"X" icon');
@@ -3451,11 +3491,12 @@
     if (flowPaused) {
       flowPaused = false;
       updatePlayPauseIcon();
-      startFlow(currentFlow);
+      resumeFlow();
+      resumeMatchingTimer();
     } else {
       flowPaused = true;
       updatePlayPauseIcon();
-      clearFlow();
+      pauseFlow();
       stopMatchingTimer();
     }
   }
@@ -3567,6 +3608,7 @@
         <button class="fcp-seg-btn fcp-loader" onclick="fcpSeg('fcp-loader',this)">Car</button>
         <button class="fcp-seg-btn fcp-loader" onclick="fcpSeg('fcp-loader',this)">Spinner</button>
         <button class="fcp-seg-btn fcp-loader" onclick="fcpSeg('fcp-loader',this)">Progress</button>
+        <button class="fcp-seg-btn fcp-loader" onclick="fcpSeg('fcp-loader',this)">Copy pulse</button>
       </div>
     </div>
 
