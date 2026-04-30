@@ -289,6 +289,47 @@
     height: 20px;
   }
 
+  /* ── Cancel X Icon button ── */
+  .cancel-x-btn {
+    position: absolute;
+    top: 62px;
+    left: 16px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #fff;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    z-index: 5;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .cancel-x-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+  }
+
+  .cancel-x-btn:active {
+    transform: scale(0.97);
+  }
+
+  .cancel-x-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  body.cancel-x-icon .close-btn {
+    display: none;
+  }
+
+  body.cancel-x-icon .cancel-x-btn {
+    display: flex;
+  }
+
   /* ── Bottom Sheet ── */
   .bottom-sheet {
     position: absolute;
@@ -2207,6 +2248,13 @@
         </svg>
       </button>
 
+      <!-- Cancel X Icon (panel option) -->
+      <button class="cancel-x-btn" onclick="handleCancelRide()" aria-label="Cancel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+
       <!-- Cancel FAB (Progressive flow) -->
       <button class="cancel-fab" id="cancelFab" onclick="handleCancelRide()">
         <img src="cross.png" alt="" aria-hidden="true" class="cancel-fab-icon">
@@ -3204,6 +3252,7 @@
     document.body.classList.toggle('flow-progressive-car', flow === 11);
     document.body.classList.toggle('loader-car', isMain && activePanel.loader === 'Car');
     document.body.classList.toggle('cancel-top-btn', isMain && activePanel.cancel === 'Top button');
+    document.body.classList.toggle('cancel-x-icon',  isMain && activePanel.cancel === '"X" icon');
 
     // Food promo: immediate
     if (config.foodPromo === 'immediate') {
