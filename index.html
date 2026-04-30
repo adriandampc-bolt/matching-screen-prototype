@@ -700,7 +700,8 @@
     display: block;
   }
 
-  body.flow-progressive-car .car-slot {
+  body.flow-progressive-car .car-slot,
+  body.loader-car .car-slot {
     display: block;
   }
 
@@ -709,7 +710,8 @@
     50%       { opacity: 0.5; }
   }
 
-  body.flow-progressive-car .car-slot img {
+  body.flow-progressive-car .car-slot img,
+  body.loader-car .car-slot img {
     animation: car-pulse 1.6s ease-in-out infinite;
   }
 
@@ -3191,6 +3193,7 @@
     document.body.classList.toggle('flow-progressive-3', flow === 9);
     document.body.classList.toggle('flow-progressive-main', flow === 10);
     document.body.classList.toggle('flow-progressive-car', flow === 11);
+    document.body.classList.toggle('loader-car', isMain && activePanel.loader === 'Car');
 
     // Food promo: immediate
     if (config.foodPromo === 'immediate') {
@@ -3203,6 +3206,8 @@
         if (isMain) {
           // Main flow: animation runs unchanged, active ride appears at matchingTimeSec
           if (activePanel.loader === 'Dots') startLoaderDots();
+          if (config.foodPromo === 'delayed') schedule(showFoodPromoDelayed, 10000);
+          if (activePanel.upsellTimingSec > 0) schedule(showPrioritiseCard, activePanel.upsellTimingSec * 1000);
           schedule(() => {
             document.getElementById('mapPulse').style.display = 'none';
             document.getElementById('closestCar').classList.remove('pulsating');
