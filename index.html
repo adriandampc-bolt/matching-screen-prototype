@@ -3306,7 +3306,9 @@
     document.getElementById('mapPulse').style.display = '';
     resetMapShift();
     sheet.innerHTML = originalSheetHTML;
-    const effectiveVariant = (isMain && activePanel.loader === 'Spinner') ? 'progressive-2' : config.variant;
+    const effectiveVariant = isMain && activePanel.loader === 'Spinner' ? 'progressive-2'
+                           : isMain && activePanel.loader === 'Bar'     ? 'progressive-main'
+                           : config.variant;
     resetSteps(config.singleStep, effectiveVariant);
 
     // Map: car visibility (main flow only)
@@ -3337,9 +3339,9 @@
     });
 
     document.body.classList.toggle('flow-progressive', flow === 6 || flow === 7 || flow === 8 || flow === 9 || flow === 10 || flow === 11);
-    document.body.classList.toggle('flow-progressive-2', flow === 8 || (isMain && activePanel.loader === 'Spinner'));
-    document.body.classList.toggle('flow-progressive-3', flow === 9 && !(isMain && activePanel.loader === 'Spinner'));
-    document.body.classList.toggle('flow-progressive-main', flow === 10);
+    document.body.classList.toggle('flow-progressive-2',    flow === 8 || (isMain && activePanel.loader === 'Spinner'));
+    document.body.classList.toggle('flow-progressive-3',    flow === 9 && !(isMain && activePanel.loader === 'Spinner') && !(isMain && activePanel.loader === 'Bar'));
+    document.body.classList.toggle('flow-progressive-main', flow === 10 || (isMain && activePanel.loader === 'Bar'));
     document.body.classList.toggle('flow-progressive-car', flow === 11);
     document.body.classList.toggle('loader-car',        isMain && activePanel.loader === 'Car');
     document.body.classList.toggle('loader-copy-pulse', isMain && activePanel.loader === 'Copy pulse');
@@ -3607,7 +3609,7 @@
         <button class="fcp-seg-btn fcp-loader active" onclick="fcpSeg('fcp-loader',this)">Dots</button>
         <button class="fcp-seg-btn fcp-loader" onclick="fcpSeg('fcp-loader',this)">Car</button>
         <button class="fcp-seg-btn fcp-loader" onclick="fcpSeg('fcp-loader',this)">Spinner</button>
-        <button class="fcp-seg-btn fcp-loader" onclick="fcpSeg('fcp-loader',this)">Progress</button>
+        <button class="fcp-seg-btn fcp-loader" onclick="fcpSeg('fcp-loader',this)">Bar</button>
         <button class="fcp-seg-btn fcp-loader" onclick="fcpSeg('fcp-loader',this)">Copy pulse</button>
       </div>
     </div>
