@@ -940,6 +940,15 @@
     display: inline-flex;
   }
 
+  /* Main Flow hides cancel-fab by default; re-shown only via panel */
+  body.flow-progressive-3 .cancel-fab {
+    display: none;
+  }
+
+  body.flow-progressive-3.cancel-top-btn .cancel-fab {
+    display: inline-flex;
+  }
+
   body.flow-progressive .action-buttons {
     display: none;
   }
@@ -2510,7 +2519,7 @@
     if (!ref) return;
     const visibleHeight = ref.offsetTop + ROUTE_PEEK;
     const sh = screenHeight();
-    const ratio = Math.max(0.3, Math.min((sh - visibleHeight) / sh, 0.85));
+    const ratio = Math.max(0.05, Math.min((sh - visibleHeight) / sh, 0.85));
     SNAP_EXPANDED = ratio;
     setSheetPosition(ratio);
   }
@@ -3017,7 +3026,7 @@
     void card.offsetHeight;
     const visibleHeight = ref.offsetTop + ROUTE_PEEK;
     const sh = screenHeight();
-    const targetRatio = Math.max(0.3, Math.min((sh - visibleHeight) / sh, 0.85));
+    const targetRatio = Math.max(0.05, Math.min((sh - visibleHeight) / sh, 0.85));
 
     // Collapse back, then animate both card and sheet simultaneously
     card.classList.remove('visible');
@@ -3194,6 +3203,7 @@
     document.body.classList.toggle('flow-progressive-main', flow === 10);
     document.body.classList.toggle('flow-progressive-car', flow === 11);
     document.body.classList.toggle('loader-car', isMain && activePanel.loader === 'Car');
+    document.body.classList.toggle('cancel-top-btn', isMain && activePanel.cancel === 'Top button');
 
     // Food promo: immediate
     if (config.foodPromo === 'immediate') {
@@ -3283,6 +3293,7 @@
     const mapBtn    = document.querySelector('.fcp-map.active');
     const loaderBtn = document.querySelector('.fcp-loader.active');
     const promoBtn  = document.querySelector('.fcp-promo.active');
+    const cancelBtn = document.querySelector('.fcp-cancel.active');
     const mtEl   = document.getElementById('fcpMatchingTime');
     const utEl   = document.getElementById('fcpUpsellTiming');
     const etaEl  = document.getElementById('fcpDropoffEta');
@@ -3295,6 +3306,7 @@
       showTimer:       timEl ? timEl.checked : true,
       promo:           promoBtn  ? promoBtn.textContent.trim()  : 'No',
       upsellTimingSec: utEl  ? Math.max(1, parseInt(utEl.value) || 44) : 44,
+      cancel:          cancelBtn ? cancelBtn.textContent.trim() : 'No',
     };
   }
 
