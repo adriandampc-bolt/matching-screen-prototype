@@ -4095,16 +4095,9 @@
 
     <div class="fcp-divider"></div>
 
-    <!-- Footer: Save + Restart -->
+    <!-- Footer: Save -->
     <div class="fcp-footer">
       <button class="fcp-save-btn" id="fcpSaveDefault">Save as default</button>
-      <button class="fcp-restart-btn" id="fcpRestartBtn">
-        <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
-          <path d="M2.5 7a4.5 4.5 0 104.5-4.5H5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M5 4.5L2.5 2 5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        Restart
-      </button>
     </div>
 
   </div>
@@ -4204,7 +4197,6 @@
   // Wire panel controls — runs after panel HTML is parsed
   document.getElementById('fcpPlayPause').addEventListener('click', fcpHandlePlayPause);
   document.getElementById('fcpRestart').addEventListener('click', () => { flowPaused = false; updatePlayPauseIcon(); startFlow(currentFlow); });
-  document.getElementById('fcpRestartBtn').addEventListener('click', () => { flowPaused = false; updatePlayPauseIcon(); startFlow(currentFlow); });
   document.getElementById('fcpSaveDefault').addEventListener('click', fcpSaveDefaults);
   document.getElementById('fcpDropoffEta').addEventListener('change', triggerRestart);
   document.getElementById('fcpTimer').addEventListener('change', triggerRestart);
