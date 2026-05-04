@@ -3896,7 +3896,7 @@
     <div class="fcp-row">
       <span class="fcp-label">Matching time</span>
       <div class="fcp-control">
-        <input class="fcp-number" type="number" id="fcpMatchingTime" value="30" min="1" max="300" placeholder="sec">
+        <input class="fcp-number" type="number" id="fcpMatchingTime" value="70" min="1" max="300" placeholder="sec">
       </div>
     </div>
 
@@ -3904,8 +3904,8 @@
     <div class="fcp-row">
       <span class="fcp-label">Map</span>
       <div class="fcp-control fcp-seg">
-        <button class="fcp-seg-btn fcp-map active" onclick="fcpSeg('fcp-map',this)">No cars</button>
-        <button class="fcp-seg-btn fcp-map" onclick="fcpSeg('fcp-map',this)">Cars</button>
+        <button class="fcp-seg-btn fcp-map" onclick="fcpSeg('fcp-map',this)">No cars</button>
+        <button class="fcp-seg-btn fcp-map active" onclick="fcpSeg('fcp-map',this)">Cars</button>
         <button class="fcp-seg-btn fcp-map" onclick="fcpSeg('fcp-map',this)">Connecting</button>
       </div>
     </div>
@@ -3938,7 +3938,7 @@
       <span class="fcp-label">Timer</span>
       <div class="fcp-control">
         <label class="fcp-checkbox-row">
-          <input type="checkbox" class="fcp-checkbox" id="fcpTimer" checked>
+          <input type="checkbox" class="fcp-checkbox" id="fcpTimer">
           <span class="fcp-checkbox-label">Show timer</span>
         </label>
       </div>
@@ -3948,9 +3948,9 @@
     <div class="fcp-row">
       <span class="fcp-label">Promo</span>
       <div class="fcp-control fcp-seg">
-        <button class="fcp-seg-btn fcp-promo active" onclick="fcpSeg('fcp-promo',this)">No</button>
+        <button class="fcp-seg-btn fcp-promo" onclick="fcpSeg('fcp-promo',this)">No</button>
         <button class="fcp-seg-btn fcp-promo" onclick="fcpSeg('fcp-promo',this)">Yes</button>
-        <button class="fcp-seg-btn fcp-promo" onclick="fcpSeg('fcp-promo',this)">Yes (delayed)</button>
+        <button class="fcp-seg-btn fcp-promo active" onclick="fcpSeg('fcp-promo',this)">Yes (delayed)</button>
       </div>
     </div>
 
@@ -3958,7 +3958,7 @@
     <div class="fcp-row">
       <span class="fcp-label">Upsell timing</span>
       <div class="fcp-control">
-        <input class="fcp-number" type="number" id="fcpUpsellTiming" value="10" min="0" max="300" placeholder="sec">
+        <input class="fcp-number" type="number" id="fcpUpsellTiming" value="50" min="0" max="300" placeholder="sec">
       </div>
     </div>
 
