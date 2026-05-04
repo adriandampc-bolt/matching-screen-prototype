@@ -3740,13 +3740,18 @@
 
   function fcpRestoreDefaults() {
     try {
-      let saved = JSON.parse(localStorage.getItem('fcpDefaults'));
-      if (!saved) {
-        // First run: persist the HTML defaults silently
-        saved = readPanelConfig();
-        localStorage.setItem('fcpDefaults', JSON.stringify(saved));
+      // Detect when HTML defaults have been updated and reset localStorage
+      const htmlDefaults = readPanelConfig();
+      const baselineStr  = JSON.stringify(htmlDefaults);
+      const savedBaseline = localStorage.getItem('fcpBaseline');
+      if (savedBaseline !== baselineStr) {
+        localStorage.setItem('fcpBaseline', baselineStr);
+        localStorage.setItem('fcpDefaults', baselineStr);
         return;
       }
+
+      const saved = JSON.parse(localStorage.getItem('fcpDefaults'));
+      if (!saved) return;
       const mtEl = document.getElementById('fcpMatchingTime');
       const utEl = document.getElementById('fcpUpsellTiming');
       const etaEl = document.getElementById('fcpDropoffEta');
@@ -3827,12 +3832,18 @@
 
   function ccpRestoreDefaults() {
     try {
-      let saved = JSON.parse(localStorage.getItem('ccpDefaults'));
-      if (!saved) {
-        saved = readCopyConfig();
-        localStorage.setItem('ccpDefaults', JSON.stringify(saved));
+      // Detect when HTML defaults have been updated and reset localStorage
+      const htmlDefaults = readCopyConfig();
+      const baselineStr  = JSON.stringify(htmlDefaults);
+      const savedBaseline = localStorage.getItem('ccpBaseline');
+      if (savedBaseline !== baselineStr) {
+        localStorage.setItem('ccpBaseline', baselineStr);
+        localStorage.setItem('ccpDefaults', baselineStr);
         return;
       }
+
+      const saved = JSON.parse(localStorage.getItem('ccpDefaults'));
+      if (!saved) return;
       saved.steps.forEach((step, i) => {
         const idx = i + 1;
         const mainEl = document.getElementById('ccpMain' + idx);
