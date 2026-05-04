@@ -672,7 +672,7 @@
   }
 
   .progress-steps.progressive-2 {
-    padding: 0 24px 16px;
+    padding: 0 24px 24px;
   }
 
   .progress-steps.progressive-2 .step {
@@ -776,7 +776,7 @@
   }
 
   .progress-steps.progressive-3 {
-    padding: 0 24px 16px;
+    padding: 0 24px 24px;
   }
 
   .progress-steps.progressive-2:has(.step-label:empty),
@@ -856,7 +856,7 @@
   }
 
   .progress-steps.progressive-main {
-    padding: 0 24px 16px;
+    padding: 0 24px 24px;
   }
 
   .progress-steps.progressive-main .step {
@@ -3797,7 +3797,13 @@
         timeSec: timeEl ? Math.max(0, parseInt(timeEl.value) || 0) : 0,
       });
     }
-    return { steps };
+    const loopEl     = document.getElementById('ccpLoop');
+    const loopTimeEl = document.getElementById('ccpLoopTime');
+    return {
+      steps,
+      loop:            loopEl     ? loopEl.checked : false,
+      loopRotationSec: loopTimeEl ? Math.max(1, parseInt(loopTimeEl.value) || 6) : 6,
+    };
   }
 
   function ccpToggleCollapse() {
@@ -3815,6 +3821,7 @@
     for (let i = 1; i < 5; i++) {
       const step = copy.steps[i];
       if (!step.timeSec) continue;
+      const isLast = i === 4;
       schedule(() => {
         if (step.main) {
           const title = document.querySelector('#progressSteps .step-title');
@@ -3822,8 +3829,23 @@
         }
         const label = document.getElementById('step1Label');
         if (label) swapLabel(label, step.sub || '', false);
+        if (isLast && copy.loop && copy.loopRotationSec > 0) {
+          startCopyLoop(copy.steps[3], copy.steps[4], copy.loopRotationSec * 1000);
+        }
       }, step.timeSec * 1000);
     }
+  }
+
+  function startCopyLoop(step4, step5, rotationMs) {
+    function apply(step) {
+      const title = document.querySelector('#progressSteps .step-title');
+      const label = document.getElementById('step1Label');
+      if (step.main && title) swapLabel(title, step.main, false);
+      if (label) swapLabel(label, step.sub || '', false);
+    }
+    function showStep4() { apply(step4); schedule(showStep5, rotationMs); }
+    function showStep5() { apply(step5); schedule(showStep4, rotationMs); }
+    schedule(showStep4, rotationMs);
   }
 
   function ccpSaveDefaults() {
@@ -3859,6 +3881,10 @@
         if (subEl)  subEl.value  = step.sub  || '';
         if (timeEl && step.timeSec) timeEl.value = step.timeSec;
       });
+      const loopEl     = document.getElementById('ccpLoop');
+      const loopTimeEl = document.getElementById('ccpLoopTime');
+      if (loopEl     && saved.loop            !== undefined) loopEl.checked    = !!saved.loop;
+      if (loopTimeEl && saved.loopRotationSec !== undefined) loopTimeEl.value  = saved.loopRotationSec;
     } catch (e) { /* ignore malformed storage */ }
   }
 
@@ -4058,6 +4084,14 @@
   </div>
 
   <div class="ccp-footer">
+    <div class="ccp-step-header" style="margin-bottom:10px;">
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+        <input type="checkbox" class="fcp-checkbox" id="ccpLoop" style="flex-shrink:0;">
+        <span class="ccp-step-name">Loop last 2 steps every</span>
+      </label>
+      <input type="number" class="ccp-time-input" id="ccpLoopTime" value="6" min="1" max="999">
+      <span class="ccp-time-suffix">sec</span>
+    </div>
     <button class="ccp-save-btn" id="ccpSaveDefault">Save as default</button>
   </div>
 </div>
@@ -4075,6 +4109,8 @@
 
   // Copy panel wiring
   document.getElementById('ccpSaveDefault').addEventListener('click', ccpSaveDefaults);
+  document.getElementById('ccpLoop').addEventListener('change', triggerRestart);
+  document.getElementById('ccpLoopTime').addEventListener('input', triggerRestart);
   for (let i = 1; i <= 5; i++) {
     const m = document.getElementById('ccpMain' + i);
     const s = document.getElementById('ccpSub'  + i);
