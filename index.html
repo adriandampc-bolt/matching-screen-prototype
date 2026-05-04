@@ -2351,6 +2351,41 @@
     color: #fff;
   }
 
+  .ccp-remove-btn {
+    margin-left: auto;
+    width: 20px;
+    height: 20px;
+    border: none;
+    background: none;
+    color: rgba(255,255,255,0.35);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    flex-shrink: 0;
+    padding: 0;
+    transition: color 0.15s, background 0.15s;
+  }
+
+  .ccp-remove-btn:hover { color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.1); }
+
+  .ccp-add-btn {
+    width: 100%;
+    height: 28px;
+    background: rgba(255,255,255,0.05);
+    border: 1px dashed rgba(255,255,255,0.15);
+    border-radius: 8px;
+    color: rgba(255,255,255,0.45);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .ccp-add-btn:hover { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.8); }
+
   /* ── Panels Toggle ── */
   .panels-toggle {
     position: fixed;
@@ -3521,7 +3556,7 @@
     activePanel = isMain ? readPanelConfig() : {};
 
     const baseConfig = FLOW_CONFIG[flow];
-    const promoMap = { 'No': false, 'Yes': 'immediate', 'Yes (delayed)': 'delayed' };
+    const promoMap = { 'No': false, 'Yes': 'delayed' };
     const config = isMain
       ? Object.assign({}, baseConfig, {
           foodPromo: promoMap[activePanel.promo] !== undefined ? promoMap[activePanel.promo] : baseConfig.foodPromo,
@@ -3591,7 +3626,7 @@
           applyCopyStep1(copyConfig);
           scheduleCopyChanges(copyConfig);
           if (activePanel.loader === 'Dots') startLoaderDots();
-          if (config.foodPromo === 'delayed') schedule(showFoodPromoDelayed, 10000);
+          if (activePanel.promo === 'Yes') schedule(showFoodPromoDelayed, activePanel.promoTimingSec * 1000);
           if (activePanel.upsellTimingSec > 0) schedule(showPrioritiseCard, activePanel.upsellTimingSec * 1000);
           schedule(() => {
             document.getElementById('mapPulse').style.display = 'none';
@@ -3680,6 +3715,7 @@
       showDropoffEta:  etaEl ? etaEl.checked : true,
       showTimer:       timEl ? timEl.checked : true,
       promo:           promoBtn  ? promoBtn.textContent.trim()  : 'No',
+      promoTimingSec:  (() => { const el = document.getElementById('fcpPromoTiming'); return el ? Math.max(0, parseInt(el.value) || 10) : 10; })(),
       upsellTimingSec: utEl  ? Math.max(1, parseInt(utEl.value) || 44) : 44,
       cancel:          cancelBtn ? cancelBtn.textContent.trim() : 'No',
     };
@@ -3758,12 +3794,14 @@
 
       const saved = JSON.parse(localStorage.getItem('fcpDefaults'));
       if (!saved) return;
-      const mtEl = document.getElementById('fcpMatchingTime');
-      const utEl = document.getElementById('fcpUpsellTiming');
+      const mtEl  = document.getElementById('fcpMatchingTime');
+      const ptEl  = document.getElementById('fcpPromoTiming');
+      const utEl  = document.getElementById('fcpUpsellTiming');
       const etaEl = document.getElementById('fcpDropoffEta');
       const timerEl = document.getElementById('fcpTimer');
-      if (mtEl && saved.matchingTimeSec) mtEl.value = saved.matchingTimeSec;
-      if (utEl && saved.upsellTimingSec) utEl.value = saved.upsellTimingSec;
+      if (mtEl && saved.matchingTimeSec)  mtEl.value  = saved.matchingTimeSec;
+      if (ptEl && saved.promoTimingSec != null) ptEl.value = saved.promoTimingSec;
+      if (utEl && saved.upsellTimingSec)  utEl.value  = saved.upsellTimingSec;
       if (etaEl) etaEl.checked = !!saved.showDropoffEta;
       if (timerEl) timerEl.checked = !!saved.showTimer;
       if (saved.map) {
@@ -3786,17 +3824,12 @@
 
   // ── Copy Control Panel ──
   function readCopyConfig() {
-    const steps = [];
-    for (let i = 1; i <= 5; i++) {
-      const mainEl = document.getElementById('ccpMain' + i);
-      const subEl  = document.getElementById('ccpSub' + i);
-      const timeEl = document.getElementById('ccpTime' + i);
-      steps.push({
-        main:    mainEl ? mainEl.value : '',
-        sub:     subEl ? subEl.value : '',
-        timeSec: timeEl ? Math.max(0, parseInt(timeEl.value) || 0) : 0,
-      });
-    }
+    const stepEls = document.querySelectorAll('#ccpSteps .ccp-step');
+    const steps = Array.from(stepEls).map((el, i) => ({
+      main:    el.querySelector('.ccp-main-input')?.value || '',
+      sub:     el.querySelector('.ccp-sub-input')?.value  || '',
+      timeSec: i === 0 ? 0 : Math.max(0, parseInt(el.querySelector('.ccp-time-field')?.value) || 0),
+    }));
     const loopEl     = document.getElementById('ccpLoop');
     const loopTimeEl = document.getElementById('ccpLoopTime');
     return {
@@ -3804,6 +3837,57 @@
       loop:            loopEl     ? loopEl.checked : false,
       loopRotationSec: loopTimeEl ? Math.max(1, parseInt(loopTimeEl.value) || 6) : 6,
     };
+  }
+
+  function ccpEsc(str) {
+    return (str || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+  }
+
+  function ccpStepHTML(num, step) {
+    const xIcon = `<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1l8 8M9 1L1 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+    return `
+      <div class="ccp-step-header">
+        <span class="ccp-step-name">Step ${num} at</span>
+        <input type="number" class="ccp-time-input ccp-time-field" value="${ccpEsc(String(step?.timeSec || ''))}" min="0" max="999">
+        <span class="ccp-time-suffix">sec</span>
+        <button class="ccp-remove-btn" onclick="ccpRemoveStep(this)" title="Remove">${xIcon}</button>
+      </div>
+      <input type="text" class="ccp-input ccp-main-input" placeholder="Main (empty = keep)" value="${ccpEsc(step?.main || '')}">
+      <input type="text" class="ccp-input ccp-sub-input"  placeholder="Subtitle copy" value="${ccpEsc(step?.sub || '')}">
+    `;
+  }
+
+  function ccpRenumber() {
+    document.querySelectorAll('#ccpSteps .ccp-step').forEach((el, i) => {
+      const nameEl = el.querySelector('.ccp-step-name');
+      if (nameEl) nameEl.textContent = i === 0 ? 'Step 1' : `Step ${i + 1} at`;
+    });
+  }
+
+  function ccpAddStep(step) {
+    const container = document.getElementById('ccpSteps');
+    const num = container.querySelectorAll('.ccp-step').length + 1;
+    const el = document.createElement('div');
+    el.className = 'ccp-step ccp-timed-step';
+    el.innerHTML = ccpStepHTML(num, step || {});
+    container.appendChild(el);
+  }
+
+  function ccpRemoveStep(btn) {
+    btn.closest('.ccp-timed-step').remove();
+    ccpRenumber();
+    triggerRestart();
+  }
+
+  function ccpBuildSteps(steps) {
+    const container = document.getElementById('ccpSteps');
+    const step1El   = container.querySelector('.ccp-step');
+    if (steps[0]) {
+      step1El.querySelector('.ccp-main-input').value = steps[0].main || '';
+      step1El.querySelector('.ccp-sub-input').value  = steps[0].sub  || '';
+    }
+    container.querySelectorAll('.ccp-timed-step').forEach(el => el.remove());
+    steps.slice(1).forEach((step, i) => ccpAddStep(step));
   }
 
   function ccpToggleCollapse() {
@@ -3818,10 +3902,11 @@
   }
 
   function scheduleCopyChanges(copy) {
-    for (let i = 1; i < 5; i++) {
+    const n = copy.steps.length;
+    for (let i = 1; i < n; i++) {
       const step = copy.steps[i];
       if (!step.timeSec) continue;
-      const isLast = i === 4;
+      const isLast = i === n - 1;
       schedule(() => {
         if (step.main) {
           const title = document.querySelector('#progressSteps .step-title');
@@ -3829,8 +3914,8 @@
         }
         const label = document.getElementById('step1Label');
         if (label) swapLabel(label, step.sub || '', false);
-        if (isLast && copy.loop && copy.loopRotationSec > 0) {
-          startCopyLoop(copy.steps[3], copy.steps[4], copy.loopRotationSec * 1000);
+        if (isLast && copy.loop && copy.loopRotationSec > 0 && n >= 2) {
+          startCopyLoop(copy.steps[n - 2], copy.steps[n - 1], copy.loopRotationSec * 1000);
         }
       }, step.timeSec * 1000);
     }
@@ -3872,19 +3957,11 @@
 
       const saved = JSON.parse(localStorage.getItem('ccpDefaults'));
       if (!saved) return;
-      saved.steps.forEach((step, i) => {
-        const idx = i + 1;
-        const mainEl = document.getElementById('ccpMain' + idx);
-        const subEl  = document.getElementById('ccpSub' + idx);
-        const timeEl = document.getElementById('ccpTime' + idx);
-        if (mainEl) mainEl.value = step.main || '';
-        if (subEl)  subEl.value  = step.sub  || '';
-        if (timeEl && step.timeSec) timeEl.value = step.timeSec;
-      });
+      if (saved.steps) ccpBuildSteps(saved.steps);
       const loopEl     = document.getElementById('ccpLoop');
       const loopTimeEl = document.getElementById('ccpLoopTime');
-      if (loopEl     && saved.loop            !== undefined) loopEl.checked    = !!saved.loop;
-      if (loopTimeEl && saved.loopRotationSec !== undefined) loopTimeEl.value  = saved.loopRotationSec;
+      if (loopEl     && saved.loop            !== undefined) loopEl.checked   = !!saved.loop;
+      if (loopTimeEl && saved.loopRotationSec !== undefined) loopTimeEl.value = saved.loopRotationSec;
     } catch (e) { /* ignore malformed storage */ }
   }
 
@@ -3981,8 +4058,15 @@
       <span class="fcp-label">Promo</span>
       <div class="fcp-control fcp-seg">
         <button class="fcp-seg-btn fcp-promo" onclick="fcpSeg('fcp-promo',this)">No</button>
-        <button class="fcp-seg-btn fcp-promo" onclick="fcpSeg('fcp-promo',this)">Yes</button>
-        <button class="fcp-seg-btn fcp-promo active" onclick="fcpSeg('fcp-promo',this)">Yes (delayed)</button>
+        <button class="fcp-seg-btn fcp-promo active" onclick="fcpSeg('fcp-promo',this)">Yes</button>
+      </div>
+    </div>
+
+    <!-- Promo timing -->
+    <div class="fcp-row">
+      <span class="fcp-label">Promo timing</span>
+      <div class="fcp-control">
+        <input class="fcp-number" type="number" id="fcpPromoTiming" value="10" min="0" max="300" placeholder="sec">
       </div>
     </div>
 
@@ -4034,53 +4118,69 @@
   </div>
 
   <div class="ccp-body">
-    <div class="ccp-step">
-      <div class="ccp-step-header">
-        <span class="ccp-step-name">Step 1</span>
+    <div id="ccpSteps">
+      <!-- Step 1 (fixed, no timing) -->
+      <div class="ccp-step">
+        <div class="ccp-step-header"><span class="ccp-step-name">Step 1</span></div>
+        <input type="text" class="ccp-input ccp-main-input" placeholder="Main copy" value="Ride requested">
+        <input type="text" class="ccp-input ccp-sub-input"  placeholder="Subtitle copy">
       </div>
-      <input type="text" class="ccp-input" id="ccpMain1" placeholder="Main copy" value="Ride requested">
-      <input type="text" class="ccp-input" id="ccpSub1"  placeholder="Subtitle copy">
+
+      <!-- Steps 2–5 (timed, removable) -->
+      <div class="ccp-step ccp-timed-step">
+        <div class="ccp-step-header">
+          <span class="ccp-step-name">Step 2 at</span>
+          <input type="number" class="ccp-time-input ccp-time-field" value="4" min="0" max="999">
+          <span class="ccp-time-suffix">sec</span>
+          <button class="ccp-remove-btn" onclick="ccpRemoveStep(this)" title="Remove">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1l8 8M9 1L1 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <input type="text" class="ccp-input ccp-main-input" placeholder="Main (empty = keep)" value="Finding your ride">
+        <input type="text" class="ccp-input ccp-sub-input"  placeholder="Subtitle copy">
+      </div>
+
+      <div class="ccp-step ccp-timed-step">
+        <div class="ccp-step-header">
+          <span class="ccp-step-name">Step 3 at</span>
+          <input type="number" class="ccp-time-input ccp-time-field" value="12" min="0" max="999">
+          <span class="ccp-time-suffix">sec</span>
+          <button class="ccp-remove-btn" onclick="ccpRemoveStep(this)" title="Remove">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1l8 8M9 1L1 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <input type="text" class="ccp-input ccp-main-input" placeholder="Main (empty = keep)" value="Expanding your search">
+        <input type="text" class="ccp-input ccp-sub-input"  placeholder="Subtitle copy" value="Checking with more drivers now">
+      </div>
+
+      <div class="ccp-step ccp-timed-step">
+        <div class="ccp-step-header">
+          <span class="ccp-step-name">Step 4 at</span>
+          <input type="number" class="ccp-time-input ccp-time-field" value="20" min="0" max="999">
+          <span class="ccp-time-suffix">sec</span>
+          <button class="ccp-remove-btn" onclick="ccpRemoveStep(this)" title="Remove">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1l8 8M9 1L1 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <input type="text" class="ccp-input ccp-main-input" placeholder="Main (empty = keep)" value="Still working on it">
+        <input type="text" class="ccp-input ccp-sub-input"  placeholder="Subtitle copy" value="We&rsquo;ll update you as soon as we can">
+      </div>
+
+      <div class="ccp-step ccp-timed-step">
+        <div class="ccp-step-header">
+          <span class="ccp-step-name">Step 5 at</span>
+          <input type="number" class="ccp-time-input ccp-time-field" value="30" min="0" max="999">
+          <span class="ccp-time-suffix">sec</span>
+          <button class="ccp-remove-btn" onclick="ccpRemoveStep(this)" title="Remove">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1l8 8M9 1L1 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <input type="text" class="ccp-input ccp-main-input" placeholder="Main (empty = keep)">
+        <input type="text" class="ccp-input ccp-sub-input"  placeholder="Subtitle copy" value="Checking with more drivers now">
+      </div>
     </div>
 
-    <div class="ccp-step">
-      <div class="ccp-step-header">
-        <span class="ccp-step-name">Step 2 at</span>
-        <input type="number" class="ccp-time-input" id="ccpTime2" value="4" min="0" max="999">
-        <span class="ccp-time-suffix">sec</span>
-      </div>
-      <input type="text" class="ccp-input" id="ccpMain2" placeholder="Main (empty = keep)" value="Finding your ride">
-      <input type="text" class="ccp-input" id="ccpSub2"  placeholder="Subtitle copy">
-    </div>
-
-    <div class="ccp-step">
-      <div class="ccp-step-header">
-        <span class="ccp-step-name">Step 3 at</span>
-        <input type="number" class="ccp-time-input" id="ccpTime3" value="12" min="0" max="999">
-        <span class="ccp-time-suffix">sec</span>
-      </div>
-      <input type="text" class="ccp-input" id="ccpMain3" placeholder="Main (empty = keep)" value="Expanding your search">
-      <input type="text" class="ccp-input" id="ccpSub3"  placeholder="Subtitle copy" value="Checking with more drivers now">
-    </div>
-
-    <div class="ccp-step">
-      <div class="ccp-step-header">
-        <span class="ccp-step-name">Step 4 at</span>
-        <input type="number" class="ccp-time-input" id="ccpTime4" value="20" min="0" max="999">
-        <span class="ccp-time-suffix">sec</span>
-      </div>
-      <input type="text" class="ccp-input" id="ccpMain4" placeholder="Main (empty = keep)" value="Still working on it">
-      <input type="text" class="ccp-input" id="ccpSub4"  placeholder="Subtitle copy" value="We&rsquo;ll update you as soon as we can">
-    </div>
-
-    <div class="ccp-step">
-      <div class="ccp-step-header">
-        <span class="ccp-step-name">Step 5 at</span>
-        <input type="number" class="ccp-time-input" id="ccpTime5" value="30" min="0" max="999">
-        <span class="ccp-time-suffix">sec</span>
-      </div>
-      <input type="text" class="ccp-input" id="ccpMain5" placeholder="Main (empty = keep)">
-      <input type="text" class="ccp-input" id="ccpSub5"  placeholder="Subtitle copy" value="Checking with more drivers now">
-    </div>
+    <button class="ccp-add-btn" onclick="ccpAddStep()">+ Add step</button>
   </div>
 
   <div class="ccp-footer">
@@ -4105,20 +4205,16 @@
   document.getElementById('fcpDropoffEta').addEventListener('change', triggerRestart);
   document.getElementById('fcpTimer').addEventListener('change', triggerRestart);
   document.getElementById('fcpMatchingTime').addEventListener('input', triggerRestart);
+  document.getElementById('fcpPromoTiming').addEventListener('input', triggerRestart);
   document.getElementById('fcpUpsellTiming').addEventListener('input', triggerRestart);
 
   // Copy panel wiring
   document.getElementById('ccpSaveDefault').addEventListener('click', ccpSaveDefaults);
   document.getElementById('ccpLoop').addEventListener('change', triggerRestart);
   document.getElementById('ccpLoopTime').addEventListener('input', triggerRestart);
-  for (let i = 1; i <= 5; i++) {
-    const m = document.getElementById('ccpMain' + i);
-    const s = document.getElementById('ccpSub'  + i);
-    const t = document.getElementById('ccpTime' + i);
-    if (m) m.addEventListener('input', triggerRestart);
-    if (s) s.addEventListener('input', triggerRestart);
-    if (t) t.addEventListener('input', triggerRestart);
-  }
+  // Event delegation covers both existing and dynamically added steps
+  document.getElementById('ccpSteps').addEventListener('input',  triggerRestart);
+  document.getElementById('ccpSteps').addEventListener('change', triggerRestart);
 
   fcpRestoreDefaults();
   ccpRestoreDefaults();
