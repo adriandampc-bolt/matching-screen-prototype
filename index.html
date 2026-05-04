@@ -2386,11 +2386,17 @@
 
   .ccp-add-btn:hover { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.8); }
 
-  /* ── Panels Toggle ── */
-  .panels-toggle {
+  /* ── Top Controls ── */
+  .top-controls {
     position: fixed;
     top: 24px;
     left: 24px;
+    display: flex;
+    gap: 6px;
+    z-index: 250;
+  }
+
+  .panels-toggle {
     width: 36px;
     height: 36px;
     border-radius: 10px;
@@ -2413,13 +2419,13 @@
 
   .panels-toggle:active { transform: scale(0.96); }
 
-  body:not(.panels-hidden) .panels-toggle {
+  body:not(.panels-hidden) #panelsToggle {
     background: #2b8659;
     border-color: #2b8659;
     color: #fff;
   }
 
-  body:not(.panels-hidden) .panels-toggle:hover {
+  body:not(.panels-hidden) #panelsToggle:hover {
     background: #2f9763;
   }
 
@@ -2432,20 +2438,34 @@
 </head>
 <body class="locked panels-hidden">
 
-<!-- Panels toggle (top-left) -->
-<button class="panels-toggle" onclick="document.body.classList.toggle('panels-hidden')" title="Toggle controls" aria-label="Toggle controls">
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-    <line x1="4"  y1="21" x2="4"  y2="14"/>
-    <line x1="4"  y1="10" x2="4"  y2="3"/>
-    <line x1="12" y1="21" x2="12" y2="12"/>
-    <line x1="12" y1="8"  x2="12" y2="3"/>
-    <line x1="20" y1="21" x2="20" y2="16"/>
-    <line x1="20" y1="12" x2="20" y2="3"/>
-    <line x1="1"  y1="14" x2="7"  y2="14"/>
-    <line x1="9"  y1="8"  x2="15" y2="8"/>
-    <line x1="17" y1="16" x2="23" y2="16"/>
-  </svg>
-</button>
+<!-- Top controls (panels toggle + play/pause + restart) -->
+<div class="top-controls">
+  <button class="panels-toggle" id="panelsToggle" onclick="document.body.classList.toggle('panels-hidden')" title="Toggle controls" aria-label="Toggle controls">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <line x1="4"  y1="21" x2="4"  y2="14"/>
+      <line x1="4"  y1="10" x2="4"  y2="3"/>
+      <line x1="12" y1="21" x2="12" y2="12"/>
+      <line x1="12" y1="8"  x2="12" y2="3"/>
+      <line x1="20" y1="21" x2="20" y2="16"/>
+      <line x1="20" y1="12" x2="20" y2="3"/>
+      <line x1="1"  y1="14" x2="7"  y2="14"/>
+      <line x1="9"  y1="8"  x2="15" y2="8"/>
+      <line x1="17" y1="16" x2="23" y2="16"/>
+    </svg>
+  </button>
+  <button class="panels-toggle" id="fcpPlayPause" title="Stop / Play">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <rect x="2" y="1" width="3.5" height="12" rx="1" fill="rgba(255,255,255,0.8)"/>
+      <rect x="8.5" y="1" width="3.5" height="12" rx="1" fill="rgba(255,255,255,0.8)"/>
+    </svg>
+  </button>
+  <button class="panels-toggle" id="fcpRestart" title="Restart">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <path d="M2.5 7a4.5 4.5 0 104.5-4.5H5" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M5 4.5L2.5 2 5 3.5" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+</div>
 
 <div class="password-gate" id="passwordGate">
   <form class="password-gate-card" onsubmit="return submitPassword(event)">
@@ -3974,22 +3994,6 @@
   <div class="fcp-header" onclick="fcpToggleCollapse()">
     <span class="fcp-title">Flow controls</span>
     <div class="fcp-header-right" onclick="event.stopPropagation()">
-      <!-- Stop / Play -->
-      <button class="fcp-icon-btn" id="fcpPlayPause" title="Stop / Play">
-        <!-- Pause icon (default state = playing) -->
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-          <rect x="2" y="1" width="3.5" height="12" rx="1" fill="rgba(255,255,255,0.8)"/>
-          <rect x="8.5" y="1" width="3.5" height="12" rx="1" fill="rgba(255,255,255,0.8)"/>
-        </svg>
-      </button>
-      <!-- Restart -->
-      <button class="fcp-icon-btn" id="fcpRestart" title="Restart">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-          <path d="M2.5 7a4.5 4.5 0 104.5-4.5H5" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M5 4.5L2.5 2 5 3.5" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-      <!-- Collapse chevron -->
       <button class="fcp-collapse-btn" onclick="fcpToggleCollapse()" title="Collapse">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
           <path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
