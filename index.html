@@ -2182,9 +2182,229 @@
     background: rgba(255,255,255,0.14);
     color: #fff;
   }
+
+  /* ── Copy Control Panel ── */
+  .copy-control-panel {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    width: 304px;
+    max-height: calc(100vh - 48px);
+    background: #1e2029;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.45), 0 1px 0 rgba(255,255,255,0.06) inset;
+    z-index: 200;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ccp-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px 12px 16px;
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    flex-shrink: 0;
+  }
+
+  .ccp-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.9);
+    letter-spacing: 0.01em;
+  }
+
+  .ccp-collapse-btn {
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: none;
+    color: rgba(255,255,255,0.4);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s, transform 0.25s;
+    flex-shrink: 0;
+  }
+
+  .ccp-collapse-btn:hover { color: rgba(255,255,255,0.75); }
+
+  .copy-control-panel.collapsed .ccp-collapse-btn {
+    transform: rotate(180deg);
+  }
+
+  .ccp-body {
+    padding: 14px 16px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow-y: auto;
+  }
+
+  .copy-control-panel.collapsed .ccp-body,
+  .copy-control-panel.collapsed .ccp-footer {
+    display: none;
+  }
+
+  .ccp-step {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .ccp-step-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 2px;
+  }
+
+  .ccp-step-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .ccp-time-input {
+    width: 50px;
+    height: 22px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 6px;
+    color: rgba(255,255,255,0.9);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 0 6px;
+    outline: none;
+    text-align: center;
+  }
+
+  .ccp-time-input:focus { border-color: rgba(43,134,89,0.7); }
+
+  .ccp-time-input::-webkit-outer-spin-button,
+  .ccp-time-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .ccp-time-input { -moz-appearance: textfield; }
+
+  .ccp-time-suffix {
+    color: rgba(255,255,255,0.4);
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .ccp-input {
+    width: 100%;
+    height: 28px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    color: rgba(255,255,255,0.9);
+    font-family: inherit;
+    font-size: 12px;
+    padding: 0 10px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .ccp-input::placeholder { color: rgba(255,255,255,0.3); }
+
+  .ccp-input:focus {
+    border-color: rgba(43,134,89,0.7);
+    background: rgba(255,255,255,0.1);
+  }
+
+  .ccp-footer {
+    padding: 12px 16px 14px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    flex-shrink: 0;
+  }
+
+  .ccp-save-btn {
+    width: 100%;
+    height: 32px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 9px;
+    color: rgba(255,255,255,0.75);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .ccp-save-btn:hover {
+    background: rgba(255,255,255,0.14);
+    color: #fff;
+  }
+
+  /* ── Panels Toggle ── */
+  .panels-toggle {
+    position: fixed;
+    top: 24px;
+    left: 24px;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(30,32,41,0.92);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 250;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .panels-toggle:hover {
+    background: rgba(40,42,53,0.96);
+    color: #fff;
+  }
+
+  .panels-toggle:active { transform: scale(0.96); }
+
+  body:not(.panels-hidden) .panels-toggle {
+    background: #2b8659;
+    border-color: #2b8659;
+    color: #fff;
+  }
+
+  body:not(.panels-hidden) .panels-toggle:hover {
+    background: #2f9763;
+  }
+
+  body.panels-hidden .flow-control-panel,
+  body.panels-hidden .copy-control-panel,
+  body.panels-hidden .flow-buttons {
+    display: none !important;
+  }
 </style>
 </head>
-<body class="locked">
+<body class="locked panels-hidden">
+
+<!-- Panels toggle (top-left) -->
+<button class="panels-toggle" onclick="document.body.classList.toggle('panels-hidden')" title="Toggle controls" aria-label="Toggle controls">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+    <line x1="4"  y1="21" x2="4"  y2="14"/>
+    <line x1="4"  y1="10" x2="4"  y2="3"/>
+    <line x1="12" y1="21" x2="12" y2="12"/>
+    <line x1="12" y1="8"  x2="12" y2="3"/>
+    <line x1="20" y1="21" x2="20" y2="16"/>
+    <line x1="20" y1="12" x2="20" y2="3"/>
+    <line x1="1"  y1="14" x2="7"  y2="14"/>
+    <line x1="9"  y1="8"  x2="15" y2="8"/>
+    <line x1="17" y1="16" x2="23" y2="16"/>
+  </svg>
+</button>
 
 <div class="password-gate" id="passwordGate">
   <form class="password-gate-card" onsubmit="return submitPassword(event)">
@@ -3286,9 +3506,11 @@
     currentFlow = flow;
     const isMain = flow === MAIN_FLOW;
 
-    // Show panel only for main flow
+    // Show panels only for main flow
     const panelEl = document.getElementById('flowControlPanel');
     if (panelEl) panelEl.style.display = isMain ? '' : 'none';
+    const copyEl = document.getElementById('copyControlPanel');
+    if (copyEl)  copyEl.style.display  = isMain ? '' : 'none';
 
     activePanel = isMain ? readPanelConfig() : {};
 
@@ -3359,6 +3581,9 @@
       if (config.singleStep === 'centered') {
         if (isMain) {
           // Main flow: animation runs unchanged, active ride appears at matchingTimeSec
+          const copyConfig = readCopyConfig();
+          applyCopyStep1(copyConfig);
+          scheduleCopyChanges(copyConfig);
           if (activePanel.loader === 'Dots') startLoaderDots();
           if (config.foodPromo === 'delayed') schedule(showFoodPromoDelayed, 10000);
           if (activePanel.upsellTimingSec > 0) schedule(showPrioritiseCard, activePanel.upsellTimingSec * 1000);
@@ -3548,6 +3773,78 @@
     } catch (e) { /* ignore malformed storage */ }
   }
 
+  // ── Copy Control Panel ──
+  function readCopyConfig() {
+    const steps = [];
+    for (let i = 1; i <= 5; i++) {
+      const mainEl = document.getElementById('ccpMain' + i);
+      const subEl  = document.getElementById('ccpSub' + i);
+      const timeEl = document.getElementById('ccpTime' + i);
+      steps.push({
+        main:    mainEl ? mainEl.value : '',
+        sub:     subEl ? subEl.value : '',
+        timeSec: timeEl ? Math.max(0, parseInt(timeEl.value) || 0) : 0,
+      });
+    }
+    return { steps };
+  }
+
+  function ccpToggleCollapse() {
+    document.getElementById('copyControlPanel').classList.toggle('collapsed');
+  }
+
+  function applyCopyStep1(copy) {
+    const title = document.querySelector('#progressSteps .step-title');
+    const label = document.getElementById('step1Label');
+    if (title && copy.steps[0].main) title.textContent = copy.steps[0].main;
+    if (label) label.textContent = copy.steps[0].sub || '';
+  }
+
+  function scheduleCopyChanges(copy) {
+    for (let i = 1; i < 5; i++) {
+      const step = copy.steps[i];
+      if (!step.timeSec) continue;
+      schedule(() => {
+        if (step.main) {
+          const title = document.querySelector('#progressSteps .step-title');
+          if (title) swapLabel(title, step.main, false);
+        }
+        const label = document.getElementById('step1Label');
+        if (label) swapLabel(label, step.sub || '', false);
+      }, step.timeSec * 1000);
+    }
+  }
+
+  function ccpSaveDefaults() {
+    const copy = readCopyConfig();
+    localStorage.setItem('ccpDefaults', JSON.stringify(copy));
+    const btn = document.getElementById('ccpSaveDefault');
+    if (!btn) return;
+    const orig = btn.textContent;
+    btn.textContent = 'Saved ✓';
+    setTimeout(() => { btn.textContent = orig; }, 1200);
+  }
+
+  function ccpRestoreDefaults() {
+    try {
+      let saved = JSON.parse(localStorage.getItem('ccpDefaults'));
+      if (!saved) {
+        saved = readCopyConfig();
+        localStorage.setItem('ccpDefaults', JSON.stringify(saved));
+        return;
+      }
+      saved.steps.forEach((step, i) => {
+        const idx = i + 1;
+        const mainEl = document.getElementById('ccpMain' + idx);
+        const subEl  = document.getElementById('ccpSub' + idx);
+        const timeEl = document.getElementById('ccpTime' + idx);
+        if (mainEl) mainEl.value = step.main || '';
+        if (subEl)  subEl.value  = step.sub  || '';
+        if (timeEl && step.timeSec) timeEl.value = step.timeSec;
+      });
+    } catch (e) { /* ignore malformed storage */ }
+  }
+
 </script>
 
 <!-- Flow Control Panel -->
@@ -3682,6 +3979,72 @@
   </div>
 </div>
 
+<!-- Copy Control Panel -->
+<div class="copy-control-panel" id="copyControlPanel">
+  <div class="ccp-header" onclick="ccpToggleCollapse()">
+    <span class="ccp-title">Copy controls</span>
+    <button class="ccp-collapse-btn" onclick="ccpToggleCollapse()" title="Collapse">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="ccp-body">
+    <div class="ccp-step">
+      <div class="ccp-step-header">
+        <span class="ccp-step-name">Step 1</span>
+      </div>
+      <input type="text" class="ccp-input" id="ccpMain1" placeholder="Main copy" value="Setting up your ride">
+      <input type="text" class="ccp-input" id="ccpSub1"  placeholder="Subtitle copy" value="Checking nearby drivers">
+    </div>
+
+    <div class="ccp-step">
+      <div class="ccp-step-header">
+        <span class="ccp-step-name">Step 2 at</span>
+        <input type="number" class="ccp-time-input" id="ccpTime2" value="8" min="0" max="999">
+        <span class="ccp-time-suffix">sec</span>
+      </div>
+      <input type="text" class="ccp-input" id="ccpMain2" placeholder="Main (empty = keep)" value="Looking for the optimal rides">
+      <input type="text" class="ccp-input" id="ccpSub2"  placeholder="Subtitle copy">
+    </div>
+
+    <div class="ccp-step">
+      <div class="ccp-step-header">
+        <span class="ccp-step-name">Step 3 at</span>
+        <input type="number" class="ccp-time-input" id="ccpTime3" value="16" min="0" max="999">
+        <span class="ccp-time-suffix">sec</span>
+      </div>
+      <input type="text" class="ccp-input" id="ccpMain3" placeholder="Main (empty = keep)" value="Reviewing available options">
+      <input type="text" class="ccp-input" id="ccpSub3"  placeholder="Subtitle copy">
+    </div>
+
+    <div class="ccp-step">
+      <div class="ccp-step-header">
+        <span class="ccp-step-name">Step 4 at</span>
+        <input type="number" class="ccp-time-input" id="ccpTime4" value="24" min="0" max="999">
+        <span class="ccp-time-suffix">sec</span>
+      </div>
+      <input type="text" class="ccp-input" id="ccpMain4" placeholder="Main (empty = keep)" value="Extending the search">
+      <input type="text" class="ccp-input" id="ccpSub4"  placeholder="Subtitle copy" value="Checking a wider area to find the right ride">
+    </div>
+
+    <div class="ccp-step">
+      <div class="ccp-step-header">
+        <span class="ccp-step-name">Step 5 at</span>
+        <input type="number" class="ccp-time-input" id="ccpTime5" value="36" min="0" max="999">
+        <span class="ccp-time-suffix">sec</span>
+      </div>
+      <input type="text" class="ccp-input" id="ccpMain5" placeholder="Main (empty = keep)">
+      <input type="text" class="ccp-input" id="ccpSub5"  placeholder="Subtitle copy" value="Checking more drivers to find the match">
+    </div>
+  </div>
+
+  <div class="ccp-footer">
+    <button class="ccp-save-btn" id="ccpSaveDefault">Save as default</button>
+  </div>
+</div>
+
 <script>
   // Wire panel controls — runs after panel HTML is parsed
   document.getElementById('fcpPlayPause').addEventListener('click', fcpHandlePlayPause);
@@ -3693,7 +4056,19 @@
   document.getElementById('fcpMatchingTime').addEventListener('input', triggerRestart);
   document.getElementById('fcpUpsellTiming').addEventListener('input', triggerRestart);
 
+  // Copy panel wiring
+  document.getElementById('ccpSaveDefault').addEventListener('click', ccpSaveDefaults);
+  for (let i = 1; i <= 5; i++) {
+    const m = document.getElementById('ccpMain' + i);
+    const s = document.getElementById('ccpSub'  + i);
+    const t = document.getElementById('ccpTime' + i);
+    if (m) m.addEventListener('input', triggerRestart);
+    if (s) s.addEventListener('input', triggerRestart);
+    if (t) t.addEventListener('input', triggerRestart);
+  }
+
   fcpRestoreDefaults();
+  ccpRestoreDefaults();
   startFlow(9);
 </script>
 </body>
