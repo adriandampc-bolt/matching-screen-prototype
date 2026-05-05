@@ -3646,8 +3646,21 @@
           applyCopyStep1(copyConfig);
           scheduleCopyChanges(copyConfig);
           if (activePanel.loader === 'Dots') startLoaderDots();
-          if (activePanel.promo === 'Yes') schedule(showFoodPromoDelayed, activePanel.promoTimingSec * 1000);
-          if (activePanel.upsellTimingSec > 0) schedule(showPrioritiseCard, activePanel.upsellTimingSec * 1000);
+          // t=0: show synchronously so the rAF positionSheetToClipRoute sees their height
+          if (activePanel.promo === 'Yes') {
+            if (activePanel.promoTimingSec === 0) {
+              const promo = document.getElementById('foodPromo');
+              if (promo) promo.classList.add('visible');
+            } else {
+              schedule(showFoodPromoDelayed, activePanel.promoTimingSec * 1000);
+            }
+          }
+          if (activePanel.upsellTimingSec === 0) {
+            const card = document.getElementById('prioritiseCard');
+            if (card) card.classList.add('visible');
+          } else {
+            schedule(showPrioritiseCard, activePanel.upsellTimingSec * 1000);
+          }
           schedule(() => {
             document.getElementById('mapPulse').style.display = 'none';
             document.getElementById('closestCar').classList.remove('pulsating');
@@ -3735,8 +3748,8 @@
       showDropoffEta:  etaEl ? etaEl.checked : true,
       showTimer:       timEl ? timEl.checked : true,
       promo:           promoBtn  ? promoBtn.textContent.trim()  : 'No',
-      promoTimingSec:  (() => { const el = document.getElementById('fcpPromoTiming'); return el ? Math.max(0, parseInt(el.value) || 10) : 10; })(),
-      upsellTimingSec: utEl  ? Math.max(1, parseInt(utEl.value) || 44) : 44,
+      promoTimingSec:  (() => { const el = document.getElementById('fcpPromoTiming'); if (!el) return 10; const v = parseInt(el.value, 10); return Number.isNaN(v) ? 10 : Math.max(0, v); })(),
+      upsellTimingSec: utEl  ? Math.max(0, parseInt(utEl.value) || 0)  : 0,
       cancel:          cancelBtn ? cancelBtn.textContent.trim() : 'No',
     };
   }
