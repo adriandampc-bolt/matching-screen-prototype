@@ -199,6 +199,19 @@
     justify-content: center;
   }
 
+  .pin-base-ring.pulsing {
+    animation: pin-base-pulse 1.5s ease-out infinite;
+  }
+
+  /* Quick scale-up at the start of each sonar ring (period matches
+     the 1.5s interval at which new pulse rings appear). */
+  @keyframes pin-base-pulse {
+    0%   { transform: scale(1); }
+    10%  { transform: scale(1.45); }
+    35%  { transform: scale(1); }
+    100% { transform: scale(1); }
+  }
+
   .pin-base-dot {
     width: 6px;
     height: 6px;
@@ -4328,6 +4341,20 @@
 
   fcpRestoreDefaults();
   ccpRestoreDefaults();
+
+  // Keep pin-base-ring in sync with mapPulse visibility.
+  // The pulse period (1.5s) matches the interval at which new sonar rings
+  // are created by the pulse-expand animation.
+  (() => {
+    const mapPulseEl = document.getElementById('mapPulse');
+    const syncPinPulse = () => {
+      const visible = mapPulseEl.style.display !== 'none';
+      document.querySelector('.pin-base-ring')?.classList.toggle('pulsing', visible);
+    };
+    new MutationObserver(syncPinPulse).observe(mapPulseEl, { attributes: true, attributeFilter: ['style'] });
+    syncPinPulse(); // set initial state
+  })();
+
   startFlow(9);
 </script>
 </body>
